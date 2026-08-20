@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Transaction Analytics Studio</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f5ff',
+              100: '#e0ebff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Chart.js and LZ-String CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
+
+  <!-- Navigation / Header Bar -->
+  <header class="bg-slate-900/90 border-b border-slate-800 backdrop-blur sticky top-0 z-30 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+          <i class="fa-solid fa-chart-pie text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-base md:text-lg text-white tracking-tight flex items-center gap-2">
+            Finance Analytics & Custom Tagging
+            <span class="text-xs font-normal text-purple-400 bg-purple-950/80 border border-purple-800/60 px-2 py-0.5 rounded-full">Pro</span>
+          </h1>
+          <p class="text-xs text-slate-400">Ammaar's Chase & Simplifi Transactions Workspace</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons & Badges -->
+      <div class="flex items-center flex-wrap gap-2 text-xs">
+        
+        <!-- Live Cloud Sync Badge -->
+        <div id="syncBadge" class="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="syncBadgeText">Cloud Live Sync</span>
+        </div>
+
+        <!-- AI Assistant Trigger -->
+        <button onclick="toggleAiDrawer()" class="flex items-center space-x-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-medium px-3 py-1.5 rounded-lg shadow-md transition-all active:scale-95">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Ask AI Chat</span>
+        </button>
+
+        <!-- CSV Upload / Paste -->
+        <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-file-csv text-blue-400"></i>
+          <span>Upload CSV</span>
+          <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)" />
+        </label>
+
+        <button onclick="openPasteModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-paste text-indigo-400"></i>
+          <span>Paste CSV</span>
+        </button>
+
+        <!-- Export CSV Data -->
+        <button onclick="exportDataCsv()" class="bg-emerald-800/80 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg border border-emerald-600 transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-download"></i>
+          <span>Export Data</span>
+        </button>
+
+        <!-- Clear Data -->
+        <button onclick="promptClearData()" class="bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-800/60 transition flex items-center space-x-1.5">
+          <i class="fa-solid fa-trash-can"></i>
+          <span>Clear Data</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Body -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-4">
+
+    <!-- KPI Summary Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <!-- Total Transactions -->
+      <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 relative overflow-hidden">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Transactions</div>
+        <div id="kpiTotalCount" class="text-2xl md:text-3xl font-bold font-mono text-slate-100">0</div>
+        <div class="absolute -right-2 -bottom-2 text-slate-800 text-5xl opacity-40 pointer-events-none">
+          <i class="fa-solid fa-list-check"></i>
+        </div>
+      </div>
+
+      <!-- Total Inflow -->
+      <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 relative overflow-hidden">
+        <div class="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-1">Total Inflow</div>
+        <div id="kpiTotalInflow" class="text-2xl md:text-3xl font-bold font-mono text-emerald-400">$0.00</div>
+        <div class="absolute -right-2 -bottom-2 text-emerald-950 text-5xl opacity-30 pointer-events-none">
+          <i class="fa-solid fa-arrow-trend-up"></i>
+        </div>
+      </div>
+
+      <!-- Total Outflow -->
+      <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 relative overflow-hidden">
+        <div class="text-xs font-semibold text-rose-400 uppercase tracking-wider mb-1">Total Outflow</div>
+        <div id="kpiTotalOutflow" class="text-2xl md:text-3xl font-bold font-mono text-rose-400">$0.00</div>
+        <div class="absolute -right-2 -bottom-2 text-rose-950 text-5xl opacity-30 pointer-events-none">
+          <i class="fa-solid fa-arrow-trend-down"></i>
+        </div>
+      </div>
+
+      <!-- Net Cash Flow -->
+      <div class="bg-slate-900 border border-slate-800/80 rounded-2xl p-4 relative overflow-hidden">
+        <div class="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-1">Net Cash Flow</div>
+        <div id="kpiNetCashFlow" class="text-2xl md:text-3xl font-bold font-mono text-blue-400">$0.00</div>
+        <div class="absolute -right-2 -bottom-2 text-blue-950 text-5xl opacity-30 pointer-events-none">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex items-center space-x-2 border-b border-slate-800 pb-2">
+      <button onclick="switchTab('transactions')" id="tabBtnTransactions" class="px-4 py-2 rounded-xl font-medium text-xs md:text-sm flex items-center space-x-2 transition bg-purple-600 text-white">
+        <i class="fa-solid fa-table"></i>
+        <span>Transactions & Tags</span>
+      </button>
+      <button onclick="switchTab('analytics')" id="tabBtnAnalytics" class="px-4 py-2 rounded-xl font-medium text-xs md:text-sm flex items-center space-x-2 transition bg-slate-800 text-slate-400 hover:text-slate-200">
+        <i class="fa-solid fa-chart-column"></i>
+        <span>Analytics & Breakdown</span>
+      </button>
+    </div>
+
+    <!-- Filter Toolbar -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3 md:p-4 space-y-3">
+      
+      <!-- Top Search & Dropdown Filters -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <!-- Search Input -->
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+          <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Search payee, category, notes..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500" />
+        </div>
+
+        <!-- Category Dropdown Checklist -->
+        <div class="relative">
+          <button onclick="toggleCategoryDropdown()" id="categoryDropdownBtn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 flex items-center justify-between">
+            <span id="categoryBtnText" class="truncate">All Categories</span>
+            <i class="fa-solid fa-chevron-down text-slate-500 text-[10px] ml-1"></i>
+          </button>
+          
+          <div id="categoryDropdownMenu" class="hidden absolute top-full left-0 right-0 mt-1 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-40 p-2 max-h-60 overflow-y-auto space-y-1">
+            <div class="flex items-center justify-between pb-1 mb-1 border-b border-slate-800 text-[11px]">
+              <button onclick="selectAllCategories(true)" class="text-purple-400 hover:underline">Select All</button>
+              <button onclick="selectAllCategories(false)" class="text-slate-400 hover:underline">Clear</button>
+            </div>
+            <div id="categoryCheckboxList" class="space-y-1"></div>
+          </div>
+        </div>
+
+        <!-- Type Filter -->
+        <div>
+          <select id="typeFilter" onchange="applyFilters()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500">
+            <option value="all">All Types (Income & Expenses)</option>
+            <option value="expense">Expenses Only (-)</option>
+            <option value="income">Income Only (+)</option>
+          </select>
+        </div>
+
+        <!-- Clear Filters Button -->
+        <div>
+          <button onclick="resetAllFilters()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-2 rounded-xl text-xs transition flex items-center justify-center space-x-1.5 border border-slate-700">
+            <i class="fa-solid fa-filter-circle-xmark"></i>
+            <span>Clear Filters</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Timeframe Date Range Picker Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-800/80">
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <span class="font-bold text-slate-400 text-[11px]">Timeframe:</span>
+          
+          <div class="flex items-center space-x-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1">
+            <span class="text-[10px] text-slate-500">From</span>
+            <input type="date" id="dateFromInput" onchange="applyFilters()" class="bg-transparent text-xs text-slate-200 focus:outline-none" />
+          </div>
+
+          <div class="flex items-center space-x-1.5 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1">
+            <span class="text-[10px] text-slate-500">To</span>
+            <input type="date" id="dateToInput" onchange="applyFilters()" class="bg-transparent text-xs text-slate-200 focus:outline-none" />
+          </div>
+
+          <!-- Graduation Cash Filter Toggle Slider -->
+          <div class="flex items-center space-x-2 bg-purple-950/40 border border-purple-800/40 rounded-xl px-3 py-1 ml-1 select-none">
+            <span class="text-[11px] font-semibold text-purple-300">Graduation Cash ($2.4k):</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="graduationCashToggle" onchange="toggleGraduationCashFilter(this.checked)" class="sr-only peer" />
+              <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+            </label>
+            <span id="gradCashStatusLabel" class="text-[10px] font-mono text-slate-400">Included</span>
+          </div>
+        </div>
+
+        <!-- Quick Date Presets -->
+        <div class="flex items-center space-x-1">
+          <button onclick="setDatePreset('thisMonth')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px]">This Month</button>
+          <button onclick="setDatePreset('last30')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px]">Last 30 Days</button>
+          <button onclick="setDatePreset('ytd')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[11px]">Year to Date</button>
+          <button onclick="setDatePreset('allTime')" class="px-2 py-1 bg-purple-900/60 hover:bg-purple-800 text-purple-200 rounded-lg text-[11px] font-semibold border border-purple-700/50">All Time</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 1: Transactions Table -->
+    <div id="viewTransactions" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-950/80 text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-800">
+              <th class="py-3 px-4 w-10 text-center">
+                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAllRows(this.checked)" class="rounded bg-slate-900 border-slate-700 text-purple-600 focus:ring-purple-500" />
+              </th>
+              <th onclick="sortTable('date')" class="py-3 px-4 cursor-pointer hover:text-white transition">
+                Date <i class="fa-solid fa-sort text-[10px] ml-1 opacity-60"></i>
+              </th>
+              <th onclick="sortTable('payee')" class="py-3 px-4 cursor-pointer hover:text-white transition">
+                Payee / Description <i class="fa-solid fa-sort text-[10px] ml-1 opacity-60"></i>
+              </th>
+              <th onclick="sortTable('category')" class="py-3 px-4 cursor-pointer hover:text-white transition">
+                Category <i class="fa-solid fa-sort text-[10px] ml-1 opacity-60"></i>
+              </th>
+              <th onclick="sortTable('amount')" class="py-3 px-4 text-right cursor-pointer hover:text-white transition">
+                Amount <i class="fa-solid fa-sort text-[10px] ml-1 opacity-60"></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="transactionTableBody" class="divide-y divide-slate-800/60 text-xs text-slate-200 font-normal">
+            <!-- Rendered by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+        <div id="paginationInfo">Showing 0 of 0 transactions</div>
+        <div class="flex items-center space-x-2">
+          <button onclick="changePage(-1)" id="btnPrevPage" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg disabled:opacity-40">Prev</button>
+          <span id="currentPageLabel" class="font-mono text-slate-200">Page 1</span>
+          <button onclick="changePage(1)" id="btnNextPage" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg disabled:opacity-40">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Analytics & Breakdown -->
+    <div id="viewAnalytics" class="hidden space-y-4">
+      <!-- Category Charts (Spending & Income) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Spending Category Breakdown Chart -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center justify-between">
+            <span>Spending by Category (Expenses)</span>
+            <i class="fa-solid fa-chart-pie text-rose-400"></i>
+          </h3>
+          <div class="h-64 relative">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Income Category Breakdown Chart -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+          <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center justify-between">
+            <span>Income by Category</span>
+            <i class="fa-solid fa-chart-pie text-emerald-400"></i>
+          </h3>
+          <div class="h-64 relative">
+            <canvas id="incomeCategoryChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Cash Flow Timeline Chart -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+        <h3 class="font-bold text-sm text-slate-200 mb-3 flex items-center justify-between">
+          <span>Monthly Cash Flow (Inflow vs Outflow)</span>
+          <i class="fa-solid fa-chart-column text-blue-400"></i>
+        </h3>
+        <div class="h-72 relative">
+          <canvas id="timelineChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- AI Chat Drawer -->
+  <div id="aiDrawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-slate-900 border-l border-slate-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
+      <div class="flex items-center space-x-2">
+        <div class="w-7 h-7 rounded-lg bg-purple-600 flex items-center justify-center text-white">
+          <i class="fa-solid fa-wand-magic-sparkles text-xs"></i>
+        </div>
+        <h3 class="font-bold text-sm text-slate-100">Gemini Finance Assistant</h3>
+      </div>
+      <button onclick="toggleAiDrawer()" class="text-slate-400 hover:text-white">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Chat Messages Container -->
+    <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs">
+      <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/60 text-slate-300">
+        👋 Hi! I can answer questions about your uploaded bank transactions, find subscription charges, or analyze your monthly spending. Try asking a question below!
+      </div>
+    </div>
+
+    <!-- Quick Prompts -->
+    <div class="p-2 border-t border-slate-800/80 bg-slate-950/40 flex flex-wrap gap-1.5">
+      <button onclick="sendQuickPrompt('What are my top 5 largest expenses?')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px]">Top 5 Expenses</button>
+      <button onclick="sendQuickPrompt('Do you see any recurring subscriptions?')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px]">Subscriptions</button>
+      <button onclick="sendQuickPrompt('Summarize my net cash flow and overall balance.')" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-[10px]">Cash Summary</button>
+    </div>
+
+    <!-- Chat Input Form -->
+    <div class="p-3 border-t border-slate-800 bg-slate-950">
+      <div class="flex items-center space-x-2">
+        <input type="text" id="chatInput" onkeydown="if(event.key==='Enter') sendChatMessage()" placeholder="Ask Gemini about your transactions..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-purple-500" />
+        <button onclick="sendChatMessage()" class="bg-purple-600 hover:bg-purple-500 text-white p-2 rounded-xl transition">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Edit Modal -->
+  <div id="editCategoryModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-pen-to-square text-purple-400"></i>
+          <span>Edit Category</span>
+        </h3>
+        <button onclick="closeCategoryEditModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="text-slate-400 font-semibold block mb-1">Payee / Description:</label>
+          <div id="editModalPayeeText" class="p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-mono"></div>
+        </div>
+
+        <div>
+          <label class="text-slate-400 font-semibold block mb-1">Category Name:</label>
+          <input type="text" id="editModalCategoryInput" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500" />
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end space-x-2 pt-2 border-t border-slate-800">
+        <button onclick="closeCategoryEditModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs">Cancel</button>
+        <button onclick="saveCategoryEdit()" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-medium rounded-xl text-xs shadow-md">Save & Sync</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Paste CSV Modal -->
+  <div id="pasteModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <i class="fa-solid fa-paste text-indigo-400"></i>
+          <span>Paste CSV Text</span>
+        </h3>
+        <button onclick="closePasteModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <textarea id="pasteCsvArea" rows="8" placeholder="Paste raw CSV text here..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+
+      <div class="flex items-center justify-end space-x-2 border-t border-slate-800 pt-3">
+        <button onclick="closePasteModal()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs">Cancel</button>
+        <button onclick="processPastedCsv()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl text-xs shadow-md">Parse & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear Data Confirmation Modal -->
+  <div id="clearDataModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl text-center">
+      <div class="w-12 h-12 bg-rose-950/80 border border-rose-800 text-rose-400 rounded-full flex items-center justify-center mx-auto text-xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-base text-slate-100 mb-1">Clear Workspace Data?</h3>
+        <p class="text-xs text-slate-400">This action will clear all local transactions and remove records from your connected Cloud Firestore database.</p>
+      </div>
+      <div class="flex items-center justify-center space-x-2 pt-2">
+        <button onclick="closeClearModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium">Cancel</button>
+        <button onclick="executeClearData()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-medium shadow-md">Yes, Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic & Firebase Synchronization -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Embedded Firebase Credentials
+    const EMBEDDED_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyD5g8I6EEWBJVTBa0lrixW5ZnkshwbBZbw",
+      authDomain: "ammaar-finance-db.firebaseapp.com",
+      projectId: "ammaar-finance-db",
+      storageBucket: "ammaar-finance-db.firebasestorage.app",
+      messagingSenderId: "330234686251",
+      appId: "1:330234686251:web:3e67651b677c0ccd92b36e"
+    };
+
+    // Global Application State
+    window.state = {
+      rawTransactions: [],
+      filteredTransactions: [],
+      selectedCategories: [],
+      allCategories: [],
+      activeTab: 'transactions',
+      sortColumn: 'date',
+      sortAsc: false, // Default Date Descending
+      currentPage: 1,
+      pageSize: 15,
+      currentEditingTxId: null,
+      excludeGraduationCash: false
+    };
+
+    let db = null;
+    let docRef = null;
+
+    window.initCloudSync = function() {
+      try {
+        const firebaseApp = initializeApp(EMBEDDED_FIREBASE_CONFIG);
+        db = getFirestore(firebaseApp);
+        docRef = doc(db, "artifacts", "ammaar-shared-workspace", "public", "data", "transactions", "shared");
+
+        // Listen to Firestore real-time updates
+        onSnapshot(docRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data.rawTransactions && Array.isArray(data.rawTransactions)) {
+              state.rawTransactions = data.rawTransactions;
+              updateSyncBadge(`Cloud Live Sync (${state.rawTransactions.length} txs)`, 'emerald');
+              autoFitDateFilter();
+              rebuildCategoryList();
+              applyFilters();
+            }
+          }
+        }, (err) => {
+          console.warn("Firestore snapshot error:", err);
+          updateSyncBadge("Local Storage Mode", "amber");
+        });
+      } catch(e) {
+        console.warn("Firebase initialization failed:", e);
+        updateSyncBadge("Local Storage Mode", "amber");
+      }
+    };
+
+    window.saveToCloud = async function() {
+      if (!docRef) return;
+      try {
+        await setDoc(docRef, {
+          rawTransactions: state.rawTransactions,
+          updatedAt: new Date().toISOString()
+        });
+      } catch(e) {
+        console.error("Cloud save failed:", e);
+      }
+    };
+
+    function updateSyncBadge(text, color) {
+      const badge = document.getElementById('syncBadge');
+      const badgeText = document.getElementById('syncBadgeText');
+      if (badgeText) badgeText.innerText = text;
+      if (badge) {
+        if (color === 'emerald') {
+          badge.className = "flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 font-medium";
+        } else {
+          badge.className = "flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg bg-amber-950/60 border border-amber-800/60 text-amber-400 font-medium";
+        }
+      }
+    }
+
+    window.autoFitDateFilter = function() {
+      if (!state.rawTransactions || state.rawTransactions.length === 0) return;
+      
+      const dates = state.rawTransactions.map(t => t.date).filter(Boolean).sort();
+      if (dates.length > 0) {
+        const minDate = dates[0];
+        const maxDate = dates[dates.length - 1];
+
+        const fromInput = document.getElementById('dateFromInput');
+        const toInput = document.getElementById('dateToInput');
+
+        if (fromInput && !fromInput.value) fromInput.value = minDate;
+        if (toInput && !toInput.value) toInput.value = maxDate;
+      }
+    };
+
+    window.applyFilters = function() {
+      const searchEl = document.getElementById('searchInput');
+      const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
+
+      const fromEl = document.getElementById('dateFromInput');
+      const toEl = document.getElementById('dateToInput');
+      const dateFrom = fromEl ? fromEl.value : '';
+      const dateTo = toEl ? toEl.value : '';
+
+      const typeEl = document.getElementById('typeFilter');
+      const type = typeEl ? typeEl.value : 'all';
+
+      state.filteredTransactions = state.rawTransactions.filter(t => {
+        // Graduation Cash filter
+        if (state.excludeGraduationCash) {
+          const payee = (t.payee || '').toLowerCase();
+          const isGradCashTransfer = payee.includes('online transfer to chk ...2831');
+          const isGradCashAtm = payee.includes('atm cash deposit') && payee.includes('macarthur');
+          if (isGradCashTransfer || isGradCashAtm) return false;
+        }
+
+        // Search text
+        if (search) {
+          const payeeMatch = (t.payee || '').toLowerCase().includes(search);
+          const catMatch = (t.category || '').toLowerCase().includes(search);
+          if (!payeeMatch && !catMatch) return false;
+        }
+
+        // Selected categories
+        if (state.selectedCategories.length > 0) {
+          if (!state.selectedCategories.includes(t.category)) return false;
+        }
+
+        // Type
+        if (type === 'expense' && t.amount >= 0) return false;
+        if (type === 'income' && t.amount < 0) return false;
+
+        // Date range
+        if (dateFrom && t.date < dateFrom) return false;
+        if (dateTo && t.date > dateTo) return false;
+
+        return true;
+      });
+
+      // Sort
+      state.filteredTransactions.sort((a, b) => {
+        let valA = a[state.sortColumn];
+        let valB = b[state.sortColumn];
+
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+
+        if (valA < valB) return state.sortAsc ? -1 : 1;
+        if (valA > valB) return state.sortAsc ? 1 : -1;
+        return 0;
+      });
+
+      state.currentPage = 1;
+      updateKpis();
+      renderTable();
+      if (state.activeTab === 'analytics') renderAnalyticsCharts();
+    };
+
+    window.toggleGraduationCashFilter = function(isExcluded) {
+      state.excludeGraduationCash = isExcluded;
+      const statusLabel = document.getElementById('gradCashStatusLabel');
+      if (statusLabel) {
+        statusLabel.innerText = isExcluded ? 'Excluded' : 'Included';
+        statusLabel.className = isExcluded ? 'text-[10px] font-mono text-rose-400 font-bold' : 'text-[10px] font-mono text-slate-400';
+      }
+      applyFilters();
+    };
+
+    window.setDatePreset = function(preset) {
+      if (!state.rawTransactions || state.rawTransactions.length === 0) return;
+      
+      const dates = state.rawTransactions.map(t => t.date).filter(Boolean).sort();
+      const maxDateStr = dates[dates.length - 1] || new Date().toISOString().split('T')[0];
+      const maxDate = new Date(maxDateStr + 'T12:00:00');
+
+      let fromDate = new Date(maxDate);
+
+      if (preset === 'thisMonth') {
+        fromDate.setDate(1);
+      } else if (preset === 'last30') {
+        fromDate.setDate(fromDate.getDate() - 30);
+      } else if (preset === 'ytd') {
+        fromDate = new Date(maxDate.getFullYear(), 0, 1);
+      } else if (preset === 'allTime') {
+        document.getElementById('dateFromInput').value = dates[0] || '';
+        document.getElementById('dateToInput').value = maxDateStr;
+        applyFilters();
+        return;
+      }
+
+      document.getElementById('dateFromInput').value = fromDate.toISOString().split('T')[0];
+      document.getElementById('dateToInput').value = maxDateStr;
+      applyFilters();
+    };
+
+    function updateKpis() {
+      let inflow = 0;
+      let outflow = 0;
+
+      state.filteredTransactions.forEach(t => {
+        if (t.amount > 0) inflow += t.amount;
+        else outflow += Math.abs(t.amount);
+      });
+
+      const net = inflow - outflow;
+
+      document.getElementById('kpiTotalCount').innerText = state.filteredTransactions.length;
+      document.getElementById('kpiTotalInflow').innerText = '$' + inflow.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('kpiTotalOutflow').innerText = '$' + outflow.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      
+      const netEl = document.getElementById('kpiNetCashFlow');
+      netEl.innerText = (net >= 0 ? '+$' : '-$') + Math.abs(net).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      netEl.className = net >= 0 ? 'text-2xl md:text-3xl font-bold font-mono text-emerald-400' : 'text-2xl md:text-3xl font-bold font-mono text-rose-400';
+    }
+
+    window.renderTable = function() {
+      const tbody = document.getElementById('transactionTableBody');
+      if (!tbody) return;
+
+      if (state.filteredTransactions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-12 text-center text-slate-500">
+              <i class="fa-solid fa-folder-open text-3xl mb-2 block text-slate-600"></i>
+              <span>No transactions found matching your filters.</span>
+            </td>
+          </tr>`;
+        document.getElementById('paginationInfo').innerText = "Showing 0 of 0 transactions";
+        return;
+      }
+
+      const total = state.filteredTransactions.length;
+      const totalPages = Math.ceil(total / state.pageSize) || 1;
+      if (state.currentPage > totalPages) state.currentPage = totalPages;
+
+      const startIndex = (state.currentPage - 1) * state.pageSize;
+      const pageData = state.filteredTransactions.slice(startIndex, startIndex + state.pageSize);
+
+      tbody.innerHTML = pageData.map(t => {
+        const amtClass = t.amount >= 0 ? 'text-emerald-400 font-semibold' : 'text-slate-100';
+        const formattedAmt = (t.amount >= 0 ? '+$' : '-$') + Math.abs(t.amount).toFixed(2);
+
+        return `
+          <tr class="hover:bg-slate-800/50 transition border-b border-slate-800/40">
+            <td class="py-3 px-4 text-center">
+              <input type="checkbox" class="rounded bg-slate-900 border-slate-700 text-purple-600 focus:ring-purple-500" />
+            </td>
+            <td class="py-3 px-4 font-mono text-slate-300 text-[11px] whitespace-nowrap">${t.date}</td>
+            <td class="py-3 px-4 text-slate-200 font-medium">${t.payee}</td>
+            <td class="py-3 px-4">
+              <button onclick="openCategoryEditModal('${t.id}')" class="px-2.5 py-1 rounded-full bg-slate-800/90 border border-slate-700 text-[11px] text-purple-300 hover:border-purple-500 transition flex items-center gap-1">
+                <span>${t.category || 'Uncategorized'}</span>
+                <i class="fa-solid fa-pen text-[9px] opacity-60"></i>
+              </button>
+            </td>
+            <td class="py-3 px-4 text-right font-mono text-xs ${amtClass}">${formattedAmt}</td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('paginationInfo').innerText = `Showing ${startIndex + 1}-${Math.min(startIndex + state.pageSize, total)} of ${total} transactions`;
+      document.getElementById('currentPageLabel').innerText = `Page ${state.currentPage} of ${totalPages}`;
+      document.getElementById('btnPrevPage').disabled = state.currentPage === 1;
+      document.getElementById('btnNextPage').disabled = state.currentPage === totalPages;
+    };
+
+    window.sortTable = function(col) {
+      if (state.sortColumn === col) {
+        state.sortAsc = !state.sortAsc;
+      } else {
+        state.sortColumn = col;
+        state.sortAsc = true;
+      }
+      applyFilters();
+    };
+
+    window.changePage = function(delta) {
+      state.currentPage += delta;
+      renderTable();
+    };
+
+    window.rebuildCategoryList = function() {
+      const cats = new Set(state.rawTransactions.map(t => t.category).filter(Boolean));
+      state.allCategories = Array.from(cats).sort();
+
+      const container = document.getElementById('categoryCheckboxList');
+      if (!container) return;
+
+      container.innerHTML = state.allCategories.map(cat => `
+        <label class="flex items-center space-x-2 text-xs text-slate-300 hover:text-white cursor-pointer py-0.5">
+          <input type="checkbox" value="${cat}" onchange="toggleCategorySelection('${cat}', this.checked)" ${state.selectedCategories.includes(cat) ? 'checked' : ''} class="rounded bg-slate-900 border-slate-700 text-purple-600 focus:ring-purple-500" />
+          <span class="truncate">${cat}</span>
+        </label>
+      `).join('');
+    };
+
+    window.toggleCategorySelection = function(cat, isChecked) {
+      if (isChecked) {
+        if (!state.selectedCategories.includes(cat)) state.selectedCategories.push(cat);
+      } else {
+        state.selectedCategories = state.selectedCategories.filter(c => c !== cat);
+      }
+      updateCategoryBtnText();
+      applyFilters();
+    };
+
+    function updateCategoryBtnText() {
+      const btnText = document.getElementById('categoryBtnText');
+      if (!btnText) return;
+
+      if (state.selectedCategories.length === 0) {
+        btnText.innerText = "All Categories";
+      } else if (state.selectedCategories.length === 1) {
+        btnText.innerText = state.selectedCategories[0];
+      } else {
+        btnText.innerText = `${state.selectedCategories.length} Categories Selected`;
+      }
+    }
+
+    window.toggleCategoryDropdown = function() {
+      const menu = document.getElementById('categoryDropdownMenu');
+      if (menu) menu.classList.toggle('hidden');
+    };
+
+    window.selectAllCategories = function(selectAll) {
+      state.selectedCategories = selectAll ? [...state.allCategories] : [];
+      rebuildCategoryList();
+      updateCategoryBtnText();
+      applyFilters();
+    };
+
+    window.openCategoryEditModal = function(id) {
+      const tx = state.rawTransactions.find(t => t.id === id);
+      if (!tx) return;
+
+      state.currentEditingTxId = id;
+      document.getElementById('editModalPayeeText').innerText = tx.payee;
+      document.getElementById('editModalCategoryInput').value = tx.category || '';
+      document.getElementById('editCategoryModal').classList.remove('hidden');
+    };
+
+    window.closeCategoryEditModal = function() {
+      document.getElementById('editCategoryModal').classList.add('hidden');
+    };
+
+    window.saveCategoryEdit = function() {
+      const newCat = document.getElementById('editModalCategoryInput').value.trim();
+      const tx = state.rawTransactions.find(t => t.id === state.currentEditingTxId);
+      if (tx) {
+        tx.category = newCat || 'Uncategorized';
+        rebuildCategoryList();
+        applyFilters();
+        saveToCloud();
+      }
+      closeCategoryEditModal();
+    };
+
+    window.toggleAiDrawer = function() {
+      const drawer = document.getElementById('aiDrawer');
+      if (drawer) drawer.classList.toggle('translate-x-full');
+    };
+
+    window.sendQuickPrompt = function(msg) {
+      document.getElementById('chatInput').value = msg;
+      sendChatMessage();
+    };
+
+    window.sendChatMessage = function() {
+      const input = document.getElementById('chatInput');
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+
+      const chatBox = document.getElementById('chatMessages');
+      chatBox.innerHTML += `
+        <div class="bg-purple-900/50 p-2.5 rounded-xl border border-purple-700/50 text-purple-100 text-right ml-6 font-medium">
+          ${text}
+        </div>`;
+
+      input.value = '';
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Simulated AI response based on filtered data context
+      setTimeout(() => {
+        let response = "I analyzed your dataset. ";
+        if (text.toLowerCase().includes('top 5') || text.toLowerCase().includes('expense')) {
+          const topExpenses = [...state.filteredTransactions].filter(t => t.amount < 0).sort((a,b) => a.amount - b.amount).slice(0,5);
+          response = "Here are your largest expenses in this view:<br><ul class='list-disc pl-4 mt-1 space-y-0.5'>";
+          topExpenses.forEach(t => {
+            response += `<li><b>${t.payee}</b>: $${Math.abs(t.amount).toFixed(2)} (${t.category})</li>`;
+          });
+          response += "</ul>";
+        } else {
+          response += `You currently have <b>${state.filteredTransactions.length} transactions</b> visible totaling a net cash flow of <b>${document.getElementById('kpiNetCashFlow').innerText}</b>.`;
+        }
+
+        chatBox.innerHTML += `
+          <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 text-slate-200 mr-6 space-y-1">
+            <div class="font-bold text-purple-400 text-[10px] flex items-center gap-1">
+              <i class="fa-solid fa-sparkles"></i> Gemini Insight
+            </div>
+            <div>${response}</div>
+          </div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }, 500);
+    };
+
+    window.promptClearData = function() {
+      document.getElementById('clearDataModal').classList.remove('hidden');
+    };
+
+    window.closeClearModal = function() {
+      document.getElementById('clearDataModal').classList.add('hidden');
+    };
+
+    window.executeClearData = function() {
+      state.rawTransactions = [];
+      state.filteredTransactions = [];
+      saveToCloud();
+      applyFilters();
+      closeClearModal();
+    };
+
+    window.openPasteModal = function() {
+      document.getElementById('pasteModal').classList.remove('hidden');
+    };
+
+    window.closePasteModal = function() {
+      document.getElementById('pasteModal').classList.add('hidden');
+    };
+
+    window.processPastedCsv = function() {
+      const text = document.getElementById('pasteCsvArea').value;
+      if (!text.trim()) return;
+
+      const lines = text.trim().split('\n');
+      const newTxs = [];
+
+      lines.forEach((line, idx) => {
+        if (idx === 0 && line.toLowerCase().includes('date')) return; // Header
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const date = parts[0].trim();
+          const payee = parts[1].trim();
+          const amt = parseFloat(parts[2].trim()) || 0;
+          const cat = parts[3] ? parts[3].trim() : 'General';
+
+          newTxs.push({
+            id: 'tx_' + Date.now() + '_' + Math.random().toString(36).substr(2,4),
+            date: date,
+            payee: payee,
+            amount: amt,
+            category: cat
+          });
+        }
+      });
+
+      if (newTxs.length > 0) {
+        state.rawTransactions = newTxs;
+        saveToCloud();
+        rebuildCategoryList();
+        autoFitDateFilter();
+        applyFilters();
+      }
+
+      closePasteModal();
+    };
+
+    window.switchTab = function(tab) {
+      state.activeTab = tab;
+      const vTx = document.getElementById('viewTransactions');
+      const vAn = document.getElementById('viewAnalytics');
+      const btnTx = document.getElementById('tabBtnTransactions');
+      const btnAn = document.getElementById('tabBtnAnalytics');
+
+      if (tab === 'transactions') {
+        vTx.classList.remove('hidden');
+        vAn.classList.add('hidden');
+        btnTx.className = "px-4 py-2 rounded-xl font-medium text-xs md:text-sm flex items-center space-x-2 transition bg-purple-600 text-white";
+        btnAn.className = "px-4 py-2 rounded-xl font-medium text-xs md:text-sm flex items-center space-x-2 transition bg-slate-800 text-slate-400 hover:text-slate-200";
+      } else {
+        vTx.classList.add('hidden');
+        vAn.classList.remove('hidden');
+        btnAn.className = "px-4 py-2 rounded-xl font-medium text-xs md:text-sm flex items-center space-x-2 transition bg-purple-600 text-white";
+        btnTx.className = "px-4 py-2 rounded-xl font-medium text-xs md:text-sm flex items-center space-x-2 transition bg-slate-800 text-slate-400 hover:text-slate-200";
+        renderAnalyticsCharts();
+      }
+    };
+
+    function renderAnalyticsCharts() {
+      // 1. Spending by Category (Expenses)
+      const expenseTotals = {};
+      // 2. Income by Category
+      const incomeTotals = {};
+      // 3. Monthly Cash Flow (Grouped by YYYY-MM)
+      const monthlyData = {};
+
+      state.filteredTransactions.forEach(t => {
+        if (!t.date) return;
+        const monthKey = t.date.substring(0, 7); // YYYY-MM
+        if (!monthlyData[monthKey]) {
+          monthlyData[monthKey] = { inflow: 0, outflow: 0 };
+        }
+
+        const categoryName = t.category || 'Uncategorized';
+
+        if (t.amount < 0) {
+          const absAmt = Math.abs(t.amount);
+          expenseTotals[categoryName] = (expenseTotals[categoryName] || 0) + absAmt;
+          monthlyData[monthKey].outflow += absAmt;
+        } else if (t.amount > 0) {
+          incomeTotals[categoryName] = (incomeTotals[categoryName] || 0) + t.amount;
+          monthlyData[monthKey].inflow += t.amount;
+        }
+      });
+
+      // Render Expense Category Chart
+      const catCtx = document.getElementById('categoryChart')?.getContext('2d');
+      if (catCtx) {
+        if (window.catChartInstance) window.catChartInstance.destroy();
+        window.catChartInstance = new Chart(catCtx, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(expenseTotals),
+            datasets: [{
+              data: Object.values(expenseTotals),
+              backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1', '#14b8a6', '#06b6d4']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 } } },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => ` ${ctx.label}: $${ctx.raw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Render Income Category Chart
+      const incomeCtx = document.getElementById('incomeCategoryChart')?.getContext('2d');
+      if (incomeCtx) {
+        if (window.incomeChartInstance) window.incomeChartInstance.destroy();
+        window.incomeChartInstance = new Chart(incomeCtx, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(incomeTotals),
+            datasets: [{
+              data: Object.values(incomeTotals),
+              backgroundColor: ['#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#84cc16', '#14b8a6', '#f59e0b']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 } } },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => ` ${ctx.label}: $${ctx.raw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Render Monthly Cash Flow Bar Chart
+      const timelineCtx = document.getElementById('timelineChart')?.getContext('2d');
+      if (timelineCtx) {
+        if (window.timelineChartInstance) window.timelineChartInstance.destroy();
+
+        const sortedMonths = Object.keys(monthlyData).sort();
+        const inflows = sortedMonths.map(m => monthlyData[m].inflow);
+        const outflows = sortedMonths.map(m => monthlyData[m].outflow);
+
+        // Format month keys into readable labels like "May 2026"
+        const formattedLabels = sortedMonths.map(m => {
+          const parts = m.split('-');
+          if (parts.length === 2) {
+            const dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, 1);
+            return dateObj.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+          }
+          return m;
+        });
+
+        window.timelineChartInstance = new Chart(timelineCtx, {
+          type: 'bar',
+          data: {
+            labels: formattedLabels,
+            datasets: [
+              {
+                label: 'Inflow (+)',
+                data: inflows,
+                backgroundColor: '#10b981',
+                borderRadius: 6
+              },
+              {
+                label: 'Outflow (-)',
+                data: outflows,
+                backgroundColor: '#ef4444',
+                borderRadius: 6
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                ticks: { color: '#94a3b8', font: { size: 11 } },
+                grid: { color: 'rgba(51, 65, 85, 0.3)' }
+              },
+              y: {
+                ticks: {
+                  color: '#94a3b8',
+                  font: { size: 10 },
+                  callback: (value) => '$' + value.toLocaleString()
+                },
+                grid: { color: 'rgba(51, 65, 85, 0.3)' }
+              }
+            },
+            plugins: {
+              legend: { labels: { color: '#e2e8f0', font: { size: 11 } } },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => ` ${ctx.dataset.label}: $${ctx.raw.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // On Load Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      initCloudSync();
+    });
+  </script>
+</body>
+</html>
