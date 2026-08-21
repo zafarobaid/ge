@@ -1,0 +1,1762 @@
+<!-- STREAMING_CHUNK:Configuring document head and styles... -->
+
+```html:Indiana Tech DBA Assignment Tracker:index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indiana Tech DBA - Fall 1 2026 Assignment Tracker</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Vue 3 CDN -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-900 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-900">
+  <div id="app" class="flex-grow flex flex-col min-h-screen">
+    
+    <!-- STREAMING_CHUNK:Rendering navigation header and Canvas links... -->
+    <!-- Header / Navbar -->
+    <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-30 shadow-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/20">
+            IT
+          </div>
+          <div>
+            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+              Indiana Tech DBA <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs px-2 py-0.5 rounded-full font-semibold">Fall 1 - 2026</span>
+            </h1>
+            <p class="text-xs text-slate-400 hidden sm:block">Assignment & Multi-Stage Discussion Tracker</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <!-- Canvas Inbox Direct Link -->
+          <a href="https://indianatech.instructure.com/conversations#filter=type=inbox" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 text-xs sm:text-sm font-medium bg-red-900/40 hover:bg-red-800/60 text-red-200 rounded-lg border border-red-700/50 transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-envelope text-red-400"></i>
+            <span class="hidden md:inline">Canvas Inbox</span>
+          </a>
+
+          <!-- Web Access / Mobile Sync Info Modal Button -->
+          <button @click="showWebGuide = true" class="px-3 py-1.5 text-xs sm:text-sm font-medium bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg border border-slate-600 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-mobile-screen-button text-amber-400"></i>
+            <span class="hidden md:inline">Mobile & Web Sync</span>
+          </button>
+
+          
+        </div>
+
+      </div>
+    </header>
+
+    <!-- STREAMING_CHUNK:Building dashboard stats and course progress... -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+      <!-- Overall Progress & Dashboard Banner -->
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden space-y-6">
+        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-10 -top-10 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          
+          <!-- Tracker 1: Overall Fall 1 Progress -->
+          <div class="lg:col-span-4 bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-inner">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-chart-line"></i> Fall 1 - 2026 Progress
+                </span>
+                <span class="text-2xl font-black text-amber-400">{{ overallPercentage }}%</span>
+              </div>
+              <h2 class="text-xl font-extrabold text-white mb-2">{{ completedCount }} of {{ totalCount }} Completed</h2>
+              
+              <!-- Progress Bar -->
+              <div class="w-full bg-slate-700/60 rounded-full h-3 p-0.5 border border-slate-600">
+                <div class="bg-gradient-to-r from-amber-500 to-emerald-400 h-2 rounded-full transition-all duration-500 shadow-md" :style="{ width: overallPercentage + '%' }"></div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 text-[11px] text-slate-300 pt-2.5 border-t border-slate-800">
+              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+                <strong class="text-amber-300">{{ pendingDiscussionsCount }}</strong> Discussions pending
+              </span>
+              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
+                <strong class="text-blue-300">{{ pendingStandardCount }}</strong> Assignments pending
+              </span>
+            </div>
+          </div>
+
+          <!-- Tracker 2: Current Week Progress -->
+          <div class="lg:col-span-4 bg-slate-900/60 border border-emerald-500/40 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-inner relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-300 border-b border-l border-emerald-500/40 text-[10px] font-bold px-2.5 py-0.5 rounded-bl-lg flex items-center gap-1">
+              <i class="fa-solid fa-clock text-[9px]"></i> Week {{ currentWeekInfo.weekNum }}
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1.5 pr-14">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-calendar-check"></i> Week Ending {{ currentWeekInfo.formatted }}
+                </span>
+                <span class="text-2xl font-black text-emerald-400">{{ currentWeekPercentage }}%</span>
+              </div>
+              <h2 class="text-xl font-extrabold text-white mb-2">{{ currentWeekCompletedCount }} of {{ currentWeekTotalCount }} Completed</h2>
+              
+              <!-- Progress Bar -->
+              <div class="w-full bg-slate-700/60 rounded-full h-3 p-0.5 border border-slate-600">
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-300 h-2 rounded-full transition-all duration-500 shadow-md" :style="{ width: currentWeekPercentage + '%' }"></div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 text-[11px] text-slate-300 pt-2.5 border-t border-slate-800">
+              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+                <strong class="text-amber-300">{{ currentWeekPendingCount }}</strong> Due this Sunday
+              </span>
+              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+                <strong class="text-emerald-300">{{ currentWeekCompletedCount }}</strong> Finished
+              </span>
+            </div>
+          </div>
+
+          <!-- Quick Class breakdown -->
+          <div class="lg:col-span-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-2.5">
+            <div v-for="course in courses" :key="course.id" 
+                 @click="selectedCourse = selectedCourse === course.code ? 'ALL' : course.code"
+                 :class="[
+                   'p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between',
+                   selectedCourse === course.code ? 'bg-slate-700/80 border-amber-400 shadow-md' : 'bg-slate-900/50 border-slate-700 hover:border-slate-500'
+                 ]">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold px-2 py-0.5 rounded text-white" :style="{ backgroundColor: course.color }">{{ course.code }}</span>
+                <span class="text-xs text-slate-400 font-mono">{{ getCourseProgress(course.code) }}%</span>
+              </div>
+              <p class="text-xs font-medium text-slate-200 line-clamp-1 mb-1.5">{{ course.name }}</p>
+              <div class="w-full bg-slate-800 rounded-full h-1.5">
+                <div class="h-1.5 rounded-full" :style="{ width: getCourseProgress(course.code) + '%', backgroundColor: course.color }"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- STREAMING_CHUNK:Setting up week tabs and filtering controls... -->
+      <div class="space-y-4">
+        
+        <!-- Week Selector Tabs -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 overflow-x-auto custom-scrollbar">
+          <div class="flex space-x-1 sm:space-x-2 min-w-max pb-1">
+            <button @click="selectedWeek = 'ALL'" 
+                    :class="[
+                      'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5',
+                      selectedWeek === 'ALL' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                    ]">
+              <i class="fa-solid fa-calendar-days"></i> All Weeks
+            </button>
+            <button v-for="w in 8" :key="w" @click="selectedWeek = w"
+                    :class="[
+                      'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition relative',
+                      selectedWeek === w ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                    ]">
+              <span>Week {{ w }}</span>
+              <span v-if="getWeekPendingBadge(w) > 0" class="ml-1.5 bg-red-500/20 text-red-300 border border-red-500/40 text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+                {{ getWeekPendingBadge(w) }}
+              </span>
+            </button>
+          </div>
+
+          <button @click="resetToSnapshot" class="text-xs text-slate-400 hover:text-amber-400 transition flex items-center gap-1 ml-4 whitespace-nowrap">
+            <i class="fa-solid fa-rotate-right"></i> Reset Data
+          </button>
+        </div>
+
+        <!-- Filters Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <span class="text-slate-400 font-medium">Filters:</span>
+            
+            <!-- Course Filter Dropdown -->
+            <select v-model="selectedCourse" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+              <option value="ALL">All Classes (3)</option>
+              <option v-for="c in courses" :key="c.code" :value="c.code">{{ c.code }} - {{ c.name }}</option>
+            </select>
+
+            <!-- Status Filter -->
+            <select v-model="selectedStatus" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+              <option value="ALL">All Statuses</option>
+              <option value="PENDING">Pending Action</option>
+              <option value="COMPLETED">Completed Only</option>
+            </select>
+
+            <!-- Type Filter -->
+            <select v-model="selectedType" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+              <option value="ALL">All Types</option>
+              <option value="Discussion">Discussions Only</option>
+              <option value="Assignment">Assignments/Papers</option>
+            </select>
+          </div>
+
+          <!-- Search Box -->
+          <div class="relative w-full sm:w-48">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
+            <input v-model="searchQuery" type="text" placeholder="Search tasks..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- STREAMING_CHUNK:Rendering assignment list and stage checkboxes... -->
+      <div v-if="filteredAssignments.length === 0" class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-12 text-center space-y-3">
+        <div class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center mx-auto text-slate-400">
+          <i class="fa-solid fa-list-check text-xl"></i>
+        </div>
+        <h3 class="text-base font-semibold text-slate-200">No assignments match your filters</h3>
+        <p class="text-xs text-slate-400">Try changing the week filter or clearing search criteria.</p>
+        <button @click="clearFilters" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-xs font-semibold rounded-lg transition">Reset Filters</button>
+      </div>
+
+      <div v-else class="space-y-4">
+        
+        <div v-for="item in filteredAssignments" :key="item.id" 
+             :class="[
+               'bg-slate-800 border rounded-2xl p-4 sm:p-5 transition shadow-lg relative overflow-hidden',
+               isFullyComplete(item) ? 'border-emerald-500/40 bg-slate-800/50 opacity-80' : 'border-slate-700 hover:border-slate-600'
+             ]">
+          
+          <!-- Colored Accent Bar based on Class -->
+          <div class="absolute left-0 top-0 bottom-0 w-1.5" :style="{ backgroundColor: getCourseColor(item.courseCode) }"></div>
+
+          <div class="pl-2 flex flex-col md:flex-row md:items-start justify-between gap-4">
+            
+            <!-- Left Info Block -->
+            <div class="space-y-2 flex-grow">
+              
+              <!-- Badges Header -->
+              <div class="flex flex-wrap items-center gap-2 text-xs">
+                <!-- Course Tag -->
+                <span class="px-2 py-0.5 rounded font-bold text-white shadow-sm" :style="{ backgroundColor: getCourseColor(item.courseCode) }">
+                  {{ item.courseCode }}
+                </span>
+
+                <!-- Week Tag -->
+                <span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-semibold">
+                  Week {{ item.week }}
+                </span>
+
+                <!-- Type Tag -->
+                <span v-if="item.type === 'Discussion'" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded font-medium flex items-center gap-1">
+                  <i class="fa-solid fa-comments text-[10px]"></i> Multi-Stage Discussion
+                </span>
+                <span v-else class="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded font-medium flex items-center gap-1">
+                  <i class="fa-solid fa-file-lines text-[10px]"></i> Deliverable Paper/Project
+                </span>
+
+                <!-- Completion Badge -->
+                <span v-if="isFullyComplete(item)" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-check text-[10px]"></i> Completed
+                </span>
+                <span v-else-if="isPartiallyComplete(item)" class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
+                  <i class="fa-solid fa-spinner text-[10px] animate-spin"></i> In Progress
+                </span>
+              </div>
+
+              <!-- Title with active Canvas hyperlink -->
+              <div class="flex items-center gap-2 flex-wrap">
+                <a v-if="item.canvasUrl" :href="item.canvasUrl" target="_blank" rel="noopener noreferrer" 
+                   :class="['text-base sm:text-lg font-bold transition hover:underline inline-flex items-center gap-2', isFullyComplete(item) ? 'line-through text-slate-400' : 'text-amber-300 hover:text-amber-200']">
+                  <span>{{ item.title }}</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-80"></i>
+                </a>
+                <h3 v-else :class="['text-base sm:text-lg font-bold transition', isFullyComplete(item) ? 'line-through text-slate-400' : 'text-white']">
+                  {{ item.title }}
+                </h3>
+              </div>
+
+              
+
+              <!-- Description / Notes -->
+              <p v-if="item.notes" class="text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 leading-relaxed">
+                <i class="fa-solid fa-circle-info text-amber-400 mr-1.5"></i>{{ item.notes }}
+              </p>
+
+            </div>
+
+            <!-- Right Interactive Task Checkers Block -->
+            <div class="bg-slate-900/70 p-3 sm:p-4 rounded-xl border border-slate-700/80 min-w-full md:min-w-[320px] space-y-3">
+              
+              <!-- Multi-Stage Discussion Checks (Thursday & Sunday) -->
+              <div v-if="item.type === 'Discussion'" class="space-y-2.5">
+                <div class="flex items-center justify-between pb-1 border-b border-slate-800 text-xs font-semibold text-slate-400">
+                  <span>DISCUSSION STAGES</span>
+                  <span class="text-amber-400">{{ getDiscussionCompletedCount(item) }}/3 Done</span>
+                </div>
+
+                <!-- Stage 1: Initial Post (Thursday) -->
+                <label @click.prevent="toggleDiscussionStage(item, 'initial')" 
+                       :class="[
+                         'flex items-center justify-between p-2 rounded-lg cursor-pointer transition border text-xs',
+                         item.stages.initial.completed ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-200'
+                       ]">
+                  <div class="flex items-center space-x-2.5">
+                    <div :class="['w-4 h-4 rounded flex items-center justify-center border transition', item.stages.initial.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'border-slate-500 bg-slate-900']">
+                      <i v-if="item.stages.initial.completed" class="fa-solid fa-check text-[10px] font-black"></i>
+                    </div>
+                    <span class="font-medium">Initial Discussion Post</span>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                    <i class="fa-regular fa-calendar mr-1"></i>Thu {{ formatDate(item.dueDateInitial) }}
+                  </span>
+                </label>
+
+                <!-- Stage 2: Peer Reply 1 (Sunday) -->
+                <label @click.prevent="toggleDiscussionStage(item, 'reply1')" 
+                       :class="[
+                         'flex items-center justify-between p-2 rounded-lg cursor-pointer transition border text-xs',
+                         item.stages.reply1.completed ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-200'
+                       ]">
+                  <div class="flex items-center space-x-2.5">
+                    <div :class="['w-4 h-4 rounded flex items-center justify-center border transition', item.stages.reply1.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'border-slate-500 bg-slate-900']">
+                      <i v-if="item.stages.reply1.completed" class="fa-solid fa-check text-[10px] font-black"></i>
+                    </div>
+                    <span class="font-medium">Peer Discussion Reply #1</span>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                    <i class="fa-regular fa-calendar mr-1"></i>Sun {{ formatDate(item.dueDateFinal) }}
+                  </span>
+                </label>
+
+                <!-- Stage 3: Peer Reply 2 (Sunday) -->
+                <label @click.prevent="toggleDiscussionStage(item, 'reply2')" 
+                       :class="[
+                         'flex items-center justify-between p-2 rounded-lg cursor-pointer transition border text-xs',
+                         item.stages.reply2.completed ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-200'
+                       ]">
+                  <div class="flex items-center space-x-2.5">
+                    <div :class="['w-4 h-4 rounded flex items-center justify-center border transition', item.stages.reply2.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'border-slate-500 bg-slate-900']">
+                      <i v-if="item.stages.reply2.completed" class="fa-solid fa-check text-[10px] font-black"></i>
+                    </div>
+                    <span class="font-medium">Peer Discussion Reply #2</span>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                    <i class="fa-regular fa-calendar mr-1"></i>Sun {{ formatDate(item.dueDateFinal) }}
+                  </span>
+                </label>
+              </div>
+
+              <!-- Standard Single Stage Completion for Regular Assignments -->
+              <div v-else class="space-y-3">
+                <div class="flex items-center justify-between text-xs font-semibold text-slate-400 pb-1 border-b border-slate-800">
+                  <span>DUE DATE</span>
+                  <span class="text-blue-400 font-mono"><i class="fa-regular fa-calendar mr-1"></i>Sun {{ formatDate(item.dueDateFinal) }}</span>
+                </div>
+
+                <button @click="toggleStandardAssignment(item)" 
+                        :class="[
+                          'w-full py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow',
+                          item.status === 'completed' 
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
+                            : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+                        ]">
+                  <i :class="['fa-solid', item.status === 'completed' ? 'fa-circle-check' : 'fa-circle']"></i>
+                  <span>{{ item.status === 'completed' ? 'Assignment Completed' : 'Mark as Completed' }}</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- STREAMING_CHUNK:Adding web sync guide modal... -->
+    <!-- Web Sync / Hosting / Mobile Instructions Modal -->
+    <div v-if="showWebGuide" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6 space-y-6 shadow-2xl relative">
+        
+        <button @click="showWebGuide = false" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-globe"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">How to Run on Web & Mobile Phone</h3>
+            <p class="text-xs text-slate-400">Access your DBA schedule from anywhere across all devices</p>
+          </div>
+        </div>
+
+        <div class="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
+          
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/70 space-y-2">
+            <h4 class="font-bold text-amber-400 text-sm flex items-center gap-2">
+              <i class="fa-brands fa-github text-base"></i> Option 1: GitHub Pages (Free Hosting)
+            </h4>
+            <ol class="list-decimal list-inside space-y-1.5 text-slate-300">
+              <li>Create a free account on <strong class="text-white">GitHub.com</strong>.</li>
+              <li>Create a new repository (e.g., <code class="bg-slate-800 px-1 py-0.5 rounded text-amber-300">dba-tracker</code>).</li>
+              <li>Upload this <code class="bg-slate-800 px-1 py-0.5 rounded text-amber-300">index.html</code> file.</li>
+              <li>Go to <strong class="text-white">Settings &rarr; Pages</strong>, set branch to <code class="bg-slate-800 px-1 py-0.5 rounded text-amber-300">main</code>, and click Save.</li>
+              <li>Your site will be live at <code class="text-emerald-400">https://yourusername.github.io/dba-tracker</code>!</li>
+            </ol>
+          </div>
+
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/70 space-y-2">
+            <h4 class="font-bold text-blue-400 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-bolt text-base"></i> Option 2: Vercel or Netlify (30-second Drag-and-Drop)
+            </h4>
+            <ol class="list-decimal list-inside space-y-1.5 text-slate-300">
+              <li>Go to <strong class="text-white">Vercel.com</strong> or <strong class="text-white">Netlify.com</strong>.</li>
+              <li>Drag and drop the folder containing this <code class="bg-slate-800 px-1 py-0.5 rounded text-amber-300">index.html</code> file onto their dashboard.</li>
+              <li>They will automatically deploy it and give you a live HTTPS link instantly.</li>
+            </ol>
+          </div>
+
+          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/70 space-y-2">
+            <h4 class="font-bold text-emerald-400 text-sm flex items-center gap-2">
+              <i class="fa-solid fa-mobile-screen text-base"></i> Mobile App Shortcut (iOS / Android)
+            </h4>
+            <p class="text-slate-300">Once hosted online (or opened on mobile Safari/Chrome):</p>
+            <ul class="list-disc list-inside space-y-1 text-slate-300">
+              <li><strong class="text-white">iPhone (Safari):</strong> Tap the <i class="fa-solid fa-share-nodes text-xs text-blue-400"></i> Share button &rarr; Select <strong>"Add to Home Screen"</strong>.</li>
+              <li><strong class="text-white">Android (Chrome):</strong> Tap the 3 dots menu &rarr; Select <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong>.</li>
+            </ul>
+            <p class="text-xs text-slate-400 italic pt-1">It will launch like a native full-screen app on your phone with all your localStorage data intact!</p>
+          </div>
+
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button @click="showWebGuide = false" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition">
+            Got it, thanks!
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* STREAMING_CHUNK:Initializing Vue application and course data... */
+    const { createApp, ref, computed, onMounted, watch } = Vue;
+
+    createApp({
+      setup() {
+        const showWebGuide = ref(false);
+        const showImportModal = ref(false);
+        const rawCsvText = ref('');
+        const searchQuery = ref('');
+
+        const selectedWeek = ref('ALL');
+        const selectedCourse = ref('ALL');
+        const selectedStatus = ref('ALL');
+        const selectedType = ref('ALL');
+
+        const courses = ref([
+          { id: 'dba7015', code: 'DBA 7015', name: 'Dr Staci (Entrepreneurship)', color: '#d97706' },
+          { id: 'dba7012', code: 'DBA 7012', name: 'Multicultural & Global Teams', color: '#0284c7' },
+          { id: 'practicum', code: 'Global Practicum', name: 'Global Practicum', color: '#059669' }
+        ]);
+
+        /* STREAMING_CHUNK:Loading default schedule snapshot and localStorage sync... */
+        // Exact pre-populated dataset from the Fall 1 - 2026 tab with active Canvas URLs
+        const defaultAssignmentsSnapshot = [
+  {
+    "id": "dba7015-w1-disc",
+    "courseCode": "DBA 7015",
+    "week": 1,
+    "type": "Discussion",
+    "title": "Module 1 Discussion: Entrepreneurial Mindset Index",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270692/submissions/49784",
+    "dueDateInitial": "2026-08-20",
+    "dueDateFinal": "2026-08-23",
+    "notes": "Initial post due Thursday Aug 20; 2 peer replies due Sunday Aug 23.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w1-assign",
+    "courseCode": "DBA 7015",
+    "week": 1,
+    "type": "Assignment",
+    "title": "Module 1 Assignment: Market Learning Styles",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270693",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-23",
+    "notes": "Due Sunday Aug 23.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w1-reflect",
+    "courseCode": "DBA 7015",
+    "week": 1,
+    "type": "Assignment",
+    "title": "Week 1 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270701",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-23",
+    "notes": "Live session reflection due Sunday Aug 23.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w2-disc",
+    "courseCode": "DBA 7015",
+    "week": 2,
+    "type": "Discussion",
+    "title": "Module 2 Discussion: Market Orientation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270691/submissions/49784",
+    "dueDateInitial": "2026-08-27",
+    "dueDateFinal": "2026-08-30",
+    "notes": "Initial post due Thursday Aug 27; 2 peer replies due Sunday Aug 30.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w2-assign",
+    "courseCode": "DBA 7015",
+    "week": 2,
+    "type": "Assignment",
+    "title": "Module 2 Assignment: Entrepreneurial Orientation and Radical Innovation Orientation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270694",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-30",
+    "notes": "Due Sunday Aug 30.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w3-disc",
+    "courseCode": "DBA 7015",
+    "week": 3,
+    "type": "Discussion",
+    "title": "Module 3 Discussion: Experimentation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270690/submissions/49784",
+    "dueDateInitial": "2026-09-03",
+    "dueDateFinal": "2026-09-06",
+    "notes": "Initial post due Thursday Sep 3; 2 peer replies due Sunday Sep 6.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w3-assign",
+    "courseCode": "DBA 7015",
+    "week": 3,
+    "type": "Assignment",
+    "title": "Module 3 Assignment: Minimum Viable New Market Entry",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270695",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-06",
+    "notes": "Due Sunday Sep 6.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w4-disc",
+    "courseCode": "DBA 7015",
+    "week": 4,
+    "type": "Discussion",
+    "title": "Module 4 Discussion: Entrepreneurial Strategy",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270689/submissions/49784",
+    "dueDateInitial": "2026-09-10",
+    "dueDateFinal": "2026-09-13",
+    "notes": "Initial post due Thursday Sep 10; 2 peer replies due Sunday Sep 13.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w4-assign",
+    "courseCode": "DBA 7015",
+    "week": 4,
+    "type": "Assignment",
+    "title": "Module 4 Assignment: Risk Management",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270696",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-13",
+    "notes": "Due Sunday Sep 13.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w4-reflect",
+    "courseCode": "DBA 7015",
+    "week": 4,
+    "type": "Assignment",
+    "title": "Week 4 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270702",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-13",
+    "notes": "Due Sunday Sep 13.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w5-disc",
+    "courseCode": "DBA 7015",
+    "week": 5,
+    "type": "Discussion",
+    "title": "Module 5 Discussion: Sustainable Business Model",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270688/submissions/49784",
+    "dueDateInitial": "2026-09-17",
+    "dueDateFinal": "2026-09-20",
+    "notes": "Initial post due Thursday Sep 17; 2 peer replies due Sunday Sep 20.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w5-assign",
+    "courseCode": "DBA 7015",
+    "week": 5,
+    "type": "Assignment",
+    "title": "Module 5 Assignment: Innovated Business Model",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270697",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-20",
+    "notes": "Due Sunday Sep 20.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w6-disc",
+    "courseCode": "DBA 7015",
+    "week": 6,
+    "type": "Discussion",
+    "title": "Module 6 Discussion: Entrepreneurial Ecosystem",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270687/submissions/49784",
+    "dueDateInitial": "2026-09-24",
+    "dueDateFinal": "2026-09-27",
+    "notes": "Initial post due Thursday Sep 24; 2 peer replies due Sunday Sep 27.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w6-assign",
+    "courseCode": "DBA 7015",
+    "week": 6,
+    "type": "Assignment",
+    "title": "Module 6 Assignment: Organization Growth Plan",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270698",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-27",
+    "notes": "Due Sunday Sep 27.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w7-disc",
+    "courseCode": "DBA 7015",
+    "week": 7,
+    "type": "Discussion",
+    "title": "Module 7 Discussion: Global Market Support Factors",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270686/submissions/49784",
+    "dueDateInitial": "2026-10-01",
+    "dueDateFinal": "2026-10-04",
+    "notes": "Initial post due Thursday Oct 1; 2 peer replies due Sunday Oct 4.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w7-assign",
+    "courseCode": "DBA 7015",
+    "week": 7,
+    "type": "Assignment",
+    "title": "Module 7 Assignment: Global Agility Framework",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270699",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-04",
+    "notes": "Due Sunday Oct 4.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w8-disc",
+    "courseCode": "DBA 7015",
+    "week": 8,
+    "type": "Discussion",
+    "title": "Module 8 Discussion: Ethics Quotient (EQ)",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270685/submissions/49784",
+    "dueDateInitial": "2026-10-08",
+    "dueDateFinal": "2026-10-11",
+    "notes": "Initial post due Thursday Oct 8; 2 peer replies due Sunday Oct 11.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w8-reflect",
+    "courseCode": "DBA 7015",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Week 8 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270703",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-11",
+    "notes": "Due Sunday Oct 11.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w1-disc",
+    "courseCode": "DBA 7012",
+    "week": 1,
+    "type": "Discussion",
+    "title": "Module 1 Discussion: Welcome to Managing Multicultural and Global Teams!",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270672/submissions/49784",
+    "dueDateInitial": "2026-08-20",
+    "dueDateFinal": "2026-08-23",
+    "notes": "Initial post due Thursday Aug 20; 2 peer replies due Sunday Aug 23.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w1-assign",
+    "courseCode": "DBA 7012",
+    "week": 1,
+    "type": "Assignment",
+    "title": "Module 1 Assignment: Team 'Cultures' and Lifecycle",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270673",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-23",
+    "notes": "Due Sunday Aug 23.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w1-reflect",
+    "courseCode": "DBA 7012",
+    "week": 1,
+    "type": "Assignment",
+    "title": "Week 1 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270682",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-23",
+    "notes": "Due Sunday Aug 23.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w2-disc",
+    "courseCode": "DBA 7012",
+    "week": 2,
+    "type": "Discussion",
+    "title": "Module 2 Discussion: Global Mindset Self-Assessment",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270671/submissions/49784",
+    "dueDateInitial": "2026-08-27",
+    "dueDateFinal": "2026-08-30",
+    "notes": "Initial post due Thursday Aug 27; 2 peer replies due Sunday Aug 30.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w2-assign",
+    "courseCode": "DBA 7012",
+    "week": 2,
+    "type": "Assignment",
+    "title": "Module 2 Assignment: Leadership vs. Management Behaviors and 'Universal' Qualities",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270674",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-30",
+    "notes": "Due Sunday Aug 30.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w3-disc",
+    "courseCode": "DBA 7012",
+    "week": 3,
+    "type": "Discussion",
+    "title": "Module 3 Discussion: Structures and Processes for Diverse Team Success",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270670/submissions/49784",
+    "dueDateInitial": "2026-09-03",
+    "dueDateFinal": "2026-09-06",
+    "notes": "Initial post due Thursday Sep 3; 2 peer replies due Sunday Sep 6.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w3-assign",
+    "courseCode": "DBA 7012",
+    "week": 3,
+    "type": "Assignment",
+    "title": "Module 3 Assignment: Team Structures, Processes and Charter",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270675",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-06",
+    "notes": "Due Sunday Sep 6.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w4-disc",
+    "courseCode": "DBA 7012",
+    "week": 4,
+    "type": "Discussion",
+    "title": "Module 4 Discussion: Trust, Engagement & Motivation Across Cultures",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270669/submissions/49784",
+    "dueDateInitial": "2026-09-10",
+    "dueDateFinal": "2026-09-13",
+    "notes": "Initial post due Thursday Sep 10; 2 peer replies due Sunday Sep 13.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w4-assign",
+    "courseCode": "DBA 7012",
+    "week": 4,
+    "type": "Assignment",
+    "title": "Module 4 Assignment: Team Engagement Plan",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270676",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-13",
+    "notes": "Due Sunday Sep 13.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w4-reflect",
+    "courseCode": "DBA 7012",
+    "week": 4,
+    "type": "Assignment",
+    "title": "Week 4 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270683",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-13",
+    "notes": "Due Sunday Sep 13.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w5-disc",
+    "courseCode": "DBA 7012",
+    "week": 5,
+    "type": "Discussion",
+    "title": "Module 5 Discussion: Sources of Conflict on Diverse Teams",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270668/submissions/49784",
+    "dueDateInitial": "2026-09-17",
+    "dueDateFinal": "2026-09-20",
+    "notes": "Initial post due Thursday Sep 17; 2 peer replies due Sunday Sep 20.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w5-assign",
+    "courseCode": "DBA 7012",
+    "week": 5,
+    "type": "Assignment",
+    "title": "Module 5 Assignment: Scenario Analysis: Conflict on Diverse Teams",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270677",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-20",
+    "notes": "Due Sunday Sep 20.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w6-disc",
+    "courseCode": "DBA 7012",
+    "week": 6,
+    "type": "Discussion",
+    "title": "Module 6 Discussion: Five Dysfunctions of a Team Assessment",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270667/submissions/49784",
+    "dueDateInitial": "2026-09-24",
+    "dueDateFinal": "2026-09-27",
+    "notes": "Initial post due Thursday Sep 24; 2 peer replies due Sunday Sep 27.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w6-assign",
+    "courseCode": "DBA 7012",
+    "week": 6,
+    "type": "Assignment",
+    "title": "Module 6 Assignment: Management and Leadership Techniques to Maintain Positive and Productive Team Dynamics",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270678",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-27",
+    "notes": "Due Sunday Sep 27.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w7-disc",
+    "courseCode": "DBA 7012",
+    "week": 7,
+    "type": "Discussion",
+    "title": "Module 7 Discussion: Priority Areas for Team Development",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270666/submissions/49784",
+    "dueDateInitial": "2026-10-01",
+    "dueDateFinal": "2026-10-04",
+    "notes": "Initial post due Thursday Oct 1; 2 peer replies due Sunday Oct 4.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w7-assign",
+    "courseCode": "DBA 7012",
+    "week": 7,
+    "type": "Assignment",
+    "title": "Module 7 Assignment: Succession Planning for Multicultural and Global Teams",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270679",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-04",
+    "notes": "Due Sunday Oct 4.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w8-disc",
+    "courseCode": "DBA 7012",
+    "week": 8,
+    "type": "Discussion",
+    "title": "Module 8 Discussion: Course Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270665/submissions/49784",
+    "dueDateInitial": "2026-10-08",
+    "dueDateFinal": "2026-10-11",
+    "notes": "Initial post due Thursday Oct 8; 2 peer replies due Sunday Oct 11.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w8-assign",
+    "courseCode": "DBA 7012",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Module 8 Assignment: Navigating Real-World Challenges",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270680",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-11",
+    "notes": "Due Sunday Oct 11.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w8-reflect",
+    "courseCode": "DBA 7012",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Week 8 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270684",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-11",
+    "notes": "Due Sunday Oct 11.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w1-disc",
+    "courseCode": "Global Practicum",
+    "week": 1,
+    "type": "Discussion",
+    "title": "Week 1: Global Leadership Capabilities Assessment Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270400/submissions/49784",
+    "dueDateInitial": "2026-08-20",
+    "dueDateFinal": "2026-08-23",
+    "notes": "Initial post Thursday Aug 20; peer replies Sunday Aug 23.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w2-disc",
+    "courseCode": "Global Practicum",
+    "week": 2,
+    "type": "Discussion",
+    "title": "Week 2: History & Culture Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270399/submissions/49784",
+    "dueDateInitial": "2026-08-27",
+    "dueDateFinal": "2026-08-30",
+    "notes": "Initial post Thursday Aug 27; peer replies Sunday Aug 30.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w2-journal",
+    "courseCode": "Global Practicum",
+    "week": 2,
+    "type": "Assignment",
+    "title": "Incident Journal - Pre-Departure Entry 1",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270410",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-30",
+    "notes": "Due Sunday Aug 30.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w3-disc",
+    "courseCode": "Global Practicum",
+    "week": 3,
+    "type": "Discussion",
+    "title": "Week 3: Society, Business, & Cultural Leadership Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270398/submissions/49784",
+    "dueDateInitial": "2026-09-03",
+    "dueDateFinal": "2026-09-06",
+    "notes": "Initial post Thursday Sep 3; peer replies Sunday Sep 6.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w5-journal",
+    "courseCode": "Global Practicum",
+    "week": 5,
+    "type": "Assignment",
+    "title": "Incident Journal - Pre-Departure Entry 2",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270411",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-20",
+    "notes": "Due Sunday Sep 20.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w5-disc",
+    "courseCode": "Global Practicum",
+    "week": 5,
+    "type": "Discussion",
+    "title": "Week 4: Travel itinerary and contact information Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270397/submissions/49784",
+    "dueDateInitial": "2026-09-17",
+    "dueDateFinal": "2026-09-20",
+    "notes": "Initial post Sep 17; peer replies Sep 20.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w6-journal",
+    "courseCode": "Global Practicum",
+    "week": 6,
+    "type": "Assignment",
+    "title": "Pre-Departure Journal 3: Disorientation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270407",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-27",
+    "notes": "Due Sunday Sep 27.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w7-journal",
+    "courseCode": "Global Practicum",
+    "week": 7,
+    "type": "Assignment",
+    "title": "Pre-Departure Journal 4: Critical Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270405",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-04",
+    "notes": "Due Sunday Oct 4.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-j5",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Incident Journal - Discourse and Learning",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270406",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-18",
+    "notes": "Due Oct 18.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-j6",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Incident Journal - Action and Integration",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270404",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-11-01",
+    "notes": "Due Nov 1.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-project",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Final Project - Presentation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270403",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-11-04",
+    "notes": "Due Nov 4.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-paper",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Final Global Practicum Paper: Canada, Culture & Leadership in Practice",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270402",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-11-08",
+    "notes": "Due Nov 8.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-reentry",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Incident Journal - Post-Travel (Re-entry) Entry 1",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270408",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-11-08",
+    "notes": "Due Nov 8.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-disc",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Discussion",
+    "title": "Week 8: Final Reflection Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270396/submissions/49784",
+    "dueDateInitial": "2026-11-05",
+    "dueDateFinal": "2026-11-08",
+    "notes": "Initial post Nov 5; peer replies Nov 8.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  }
+];
+
+        const assignments = ref(JSON.parse(JSON.stringify(defaultAssignmentsSnapshot)));
+
+        // Storage with version key
+        const loadFromLocalStorage = () => {
+          const stored = localStorage.getItem('indiana_tech_dba_fall1_v4');
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                assignments.value = parsed;
+              } else {
+                assignments.value = JSON.parse(JSON.stringify(defaultAssignmentsSnapshot));
+              }
+            } catch (e) {
+              assignments.value = JSON.parse(JSON.stringify(defaultAssignmentsSnapshot));
+            }
+          } else {
+            assignments.value = JSON.parse(JSON.stringify(defaultAssignmentsSnapshot));
+          }
+        };
+
+        const saveToLocalStorage = () => {
+          localStorage.setItem('indiana_tech_dba_fall1_v4', JSON.stringify(assignments.value));
+        };
+
+        watch(assignments, () => {
+          saveToLocalStorage();
+        }, { deep: true });
+
+        /* STREAMING_CHUNK:Defining task completion handlers and computation logic... */
+        const toggleDiscussionStage = (item, stageKey) => {
+          if (!item.stages || !item.stages[stageKey]) return;
+          item.stages[stageKey].completed = !item.stages[stageKey].completed;
+
+          // Check if all 3 stages are complete
+          const allDone = item.stages.initial.completed && item.stages.reply1.completed && item.stages.reply2.completed;
+          const anyDone = item.stages.initial.completed || item.stages.reply1.completed || item.stages.reply2.completed;
+
+          if (allDone) {
+            item.status = 'completed';
+          } else if (anyDone) {
+            item.status = 'in_progress';
+          } else {
+            item.status = 'not_started';
+          }
+        };
+
+        const toggleStandardAssignment = (item) => {
+          item.status = item.status === 'completed' ? 'not_started' : 'completed';
+        };
+
+        const isFullyComplete = (item) => {
+          if (item.type === 'Discussion') {
+            return item.stages && item.stages.initial.completed && item.stages.reply1.completed && item.stages.reply2.completed;
+          }
+          return item.status === 'completed';
+        };
+
+        const isPartiallyComplete = (item) => {
+          if (item.type === 'Discussion' && item.stages) {
+            const count = (item.stages.initial.completed ? 1 : 0) + (item.stages.reply1.completed ? 1 : 0) + (item.stages.reply2.completed ? 1 : 0);
+            return count > 0 && count < 3;
+          }
+          return item.status === 'in_progress';
+        };
+
+        const getDiscussionCompletedCount = (item) => {
+          if (!item.stages) return 0;
+          return (item.stages.initial.completed ? 1 : 0) + (item.stages.reply1.completed ? 1 : 0) + (item.stages.reply2.completed ? 1 : 0);
+        };
+
+        const resetToSnapshot = () => {
+          assignments.value = JSON.parse(JSON.stringify(defaultAssignmentsSnapshot));
+          saveToLocalStorage();
+        };
+
+        // --- Computed Filtering & Stats ---
+        const filteredAssignments = computed(() => {
+          return assignments.value.filter(item => {
+            // Week Filter
+            if (selectedWeek.value !== 'ALL' && item.week !== selectedWeek.value) return false;
+            
+            // Course Filter
+            if (selectedCourse.value !== 'ALL' && item.courseCode !== selectedCourse.value) return false;
+
+            // Type Filter
+            if (selectedType.value !== 'ALL' && item.type !== selectedType.value) return false;
+
+            // Status Filter
+            if (selectedStatus.value === 'PENDING' && isFullyComplete(item)) return false;
+            if (selectedStatus.value === 'COMPLETED' && !isFullyComplete(item)) return false;
+
+            // Search Query
+            if (searchQuery.value.trim() !== '') {
+              const q = searchQuery.value.toLowerCase();
+              const matchTitle = item.title.toLowerCase().includes(q);
+              const matchCourse = item.courseCode.toLowerCase().includes(q);
+              const matchNotes = item.notes ? item.notes.toLowerCase().includes(q) : false;
+              if (!matchTitle && !matchCourse && !matchNotes) return false;
+            }
+
+            return true;
+          });
+        });
+
+        const totalCount = computed(() => assignments.value.length);
+
+        const completedCount = computed(() => {
+          return assignments.value.filter(item => isFullyComplete(item)).length;
+        });
+
+        const overallPercentage = computed(() => {
+          if (totalCount.value === 0) return 0;
+          return Math.round((completedCount.value / totalCount.value) * 100);
+        });
+
+        const pendingDiscussionsCount = computed(() => {
+          return assignments.value.filter(item => item.type === 'Discussion' && !isFullyComplete(item)).length;
+        });
+
+                // Week Sunday End Dates lookup
+        const weekEndDates = {
+          1: 'Sunday Aug 23rd',
+          2: 'Sunday Aug 30th',
+          3: 'Sunday Sep 6th',
+          4: 'Sunday Sep 13th',
+          5: 'Sunday Sep 20th',
+          6: 'Sunday Sep 27th',
+          7: 'Sunday Oct 4th',
+          8: 'Sunday Oct 11th'
+        };
+
+        const currentWeekInfo = computed(() => {
+          if (selectedWeek.value !== 'ALL') {
+            const w = selectedWeek.value;
+            return {
+              weekNum: w,
+              formatted: weekEndDates[w] || ('Sunday Week ' + w)
+            };
+          }
+          const todayStr = new Date().toISOString().split('T')[0];
+          let weekNum = 1;
+          if (todayStr <= '2026-08-23') weekNum = 1;
+          else if (todayStr <= '2026-08-30') weekNum = 2;
+          else if (todayStr <= '2026-09-06') weekNum = 3;
+          else if (todayStr <= '2026-09-13') weekNum = 4;
+          else if (todayStr <= '2026-09-20') weekNum = 5;
+          else if (todayStr <= '2026-09-27') weekNum = 6;
+          else if (todayStr <= '2026-10-04') weekNum = 7;
+          else weekNum = 8;
+
+          return {
+            weekNum,
+            formatted: weekEndDates[weekNum] || 'Sunday Aug 23rd'
+          };
+        });
+
+        const currentWeekAssignments = computed(() => {
+          return assignments.value.filter(i => i.week === currentWeekInfo.value.weekNum);
+        });
+
+        const currentWeekTotalCount = computed(() => currentWeekAssignments.value.length);
+
+        const currentWeekCompletedCount = computed(() => {
+          return currentWeekAssignments.value.filter(i => isFullyComplete(i)).length;
+        });
+
+        const currentWeekPercentage = computed(() => {
+          if (currentWeekTotalCount.value === 0) return 0;
+          return Math.round((currentWeekCompletedCount.value / currentWeekTotalCount.value) * 100);
+        });
+
+        const currentWeekPendingCount = computed(() => {
+          return currentWeekTotalCount.value - currentWeekCompletedCount.value;
+        });
+
+        const pendingStandardCount = computed(() => {
+          return assignments.value.filter(item => item.type !== 'Discussion' && !isFullyComplete(item)).length;
+        });
+
+        const getCourseColor = (courseCode) => {
+          const c = courses.value.find(x => x.code === courseCode);
+          return c ? c.color : '#64748b';
+        };
+
+        const getCourseProgress = (courseCode) => {
+          const courseItems = assignments.value.filter(i => i.courseCode === courseCode);
+          if (courseItems.length === 0) return 0;
+          const done = courseItems.filter(i => isFullyComplete(i)).length;
+          return Math.round((done / courseItems.length) * 100);
+        };
+
+        const getWeekPendingBadge = (weekNumber) => {
+          return assignments.value.filter(i => i.week === weekNumber && !isFullyComplete(i)).length;
+        };
+
+        const clearFilters = () => {
+          selectedWeek.value = 'ALL';
+          selectedCourse.value = 'ALL';
+          selectedStatus.value = 'ALL';
+          selectedType.value = 'ALL';
+          searchQuery.value = '';
+        };
+
+        const formatDate = (dateStr) => {
+          if (!dateStr) return '';
+          const parts = dateStr.split('-');
+          if (parts.length === 3) {
+            return `${parts[1]}/${parts[2]}`;
+          }
+          return dateStr;
+        };
+
+        /* STREAMING_CHUNK:Implementing CSV file parser and mounting app... */
+        const handleFileUpload = (event) => {
+          const file = event.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            rawCsvText.value = e.target.result;
+          };
+          reader.readAsText(file);
+        };
+
+        const parseCustomCSV = () => {
+          if (!rawCsvText.value.trim()) return;
+
+          try {
+            const lines = rawCsvText.value.trim().split('\n');
+            if (lines.length < 2) return;
+
+            const parsed = [];
+            for (let i = 1; i < lines.length; i++) {
+              const line = lines[i].trim();
+              if (!line) continue;
+              
+              const cols = line.split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
+              if (cols.length >= 4) {
+                const courseCode = cols[0] || 'DBA Course';
+                const week = parseInt(cols[1]) || 1;
+                const type = cols[2] || (cols[3].toLowerCase().includes('discussion') ? 'Discussion' : 'Assignment');
+                const title = cols[3] || 'Assignment';
+                const thuDue = cols[4] || '2026-08-27';
+                const sunDue = cols[5] || '2026-08-30';
+                const notes = cols[6] || '';
+                const canvasUrl = cols[7] || (cols[3].startsWith('http') ? cols[3] : 'https://indianatech.instructure.com');
+
+                const isDisc = type.toLowerCase().includes('discussion');
+
+                parsed.push({
+                  id: `csv-${i}-${Date.now()}`,
+                  courseCode: courseCode,
+                  week: week,
+                  type: isDisc ? 'Discussion' : 'Assignment',
+                  title: title,
+                  canvasUrl: canvasUrl,
+                  dueDateInitial: isDisc ? thuDue : null,
+                  dueDateFinal: sunDue,
+                  notes: notes,
+                  stages: isDisc ? {
+                    initial: { label: 'Initial Discussion Post', completed: false },
+                    reply1: { label: 'Peer Reply 1', completed: false },
+                    reply2: { label: 'Peer Reply 2', completed: false }
+                  } : null,
+                  status: 'not_started'
+                });
+              }
+            }
+
+            if (parsed.length > 0) {
+              assignments.value = parsed;
+              saveToLocalStorage();
+              showImportModal.value = false;
+            }
+          } catch (e) {
+            console.error('CSV Parsing Error:', e);
+          }
+        };
+
+        onMounted(() => {
+          loadFromLocalStorage();
+        });
+
+        return {
+          currentWeekInfo,
+          currentWeekTotalCount,
+          currentWeekCompletedCount,
+          currentWeekPercentage,
+          currentWeekPendingCount,
+          showWebGuide,
+          showImportModal,
+          rawCsvText,
+          searchQuery,
+          selectedWeek,
+          selectedCourse,
+          selectedStatus,
+          selectedType,
+          courses,
+          assignments,
+          filteredAssignments,
+          totalCount,
+          completedCount,
+          overallPercentage,
+          pendingDiscussionsCount,
+          pendingStandardCount,
+          getCourseColor,
+          getCourseProgress,
+          getWeekPendingBadge,
+          toggleDiscussionStage,
+          toggleStandardAssignment,
+          isFullyComplete,
+          isPartiallyComplete,
+          getDiscussionCompletedCount,
+          resetToSnapshot,
+          clearFilters,
+          formatDate,
+          handleFileUpload,
+          parseCustomCSV
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
+
