@@ -1,6 +1,3 @@
-<!-- STREAMING_CHUNK:Configuring document head and styles... -->
-
-```html:Indiana Tech DBA Assignment Tracker:index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- Vue 3 CDN -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- Supabase JS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
     body {
@@ -47,9 +46,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-amber-500/20">
-            IT
-          </div>
+          <img src="data:image/png;base64,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" alt="Indiana Tech Logo" class="h-9 sm:h-11 w-auto object-contain drop-shadow-md">
           <div>
             <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
               Indiana Tech DBA <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs px-2 py-0.5 rounded-full font-semibold">Fall 1 - 2026</span>
@@ -65,18 +62,17 @@
             <span class="hidden md:inline">Canvas Inbox</span>
           </a>
 
+          <!-- Cloud Sync Modal Button -->
+          <button @click="showCloudModal = true" :class="['px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border transition flex items-center gap-1.5 shadow-sm', isCloudConnected ? 'bg-emerald-900/40 text-emerald-300 border-emerald-600/50 hover:bg-emerald-800/60' : 'bg-amber-950/40 text-amber-300 border-amber-600/50 hover:bg-amber-900/60']">
+            <i :class="['fa-solid', isCloudConnected ? 'fa-cloud-check text-emerald-400' : 'fa-cloud-arrow-up text-amber-400']"></i>
+            <span class="hidden md:inline">{{ isCloudConnected ? 'Cloud Synced' : 'Connect Cloud' }}</span>
+          </button>
+
           <!-- Web Access / Mobile Sync Info Modal Button -->
           <button @click="showWebGuide = true" class="px-3 py-1.5 text-xs sm:text-sm font-medium bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg border border-slate-600 transition flex items-center gap-1.5">
             <i class="fa-solid fa-mobile-screen-button text-amber-400"></i>
             <span class="hidden md:inline">Mobile & Web Sync</span>
-          </button>
-
-          <!-- CSV / Data Settings -->
-          <button @click="showImportModal = true" class="px-3 py-1.5 text-xs sm:text-sm font-medium bg-amber-500 hover:bg-amber-400 text-slate-950 font-semibold rounded-lg shadow transition flex items-center gap-1.5">
-            <i class="fa-solid fa-file-csv"></i>
-            <span>Import / CSV</span>
-          </button>
-        </div>
+          </button>        </div>
 
       </div>
     </header>
@@ -85,56 +81,86 @@
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
       <!-- Overall Progress & Dashboard Banner -->
-      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden">
+      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden space-y-6">
         <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -left-10 -top-10 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
         
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
-          <!-- Overall Stats -->
-          <div class="lg:col-span-2 space-y-3">
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Fall 1 - 2026 Progress</span>
-                <h2 class="text-2xl font-bold text-white">{{ completedCount }} of {{ totalCount }} Completed</h2>
+          <!-- Tracker 1: Overall Fall 1 Progress -->
+          <div class="lg:col-span-4 bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-inner">
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-chart-line"></i> Fall 1 - 2026 Progress
+                </span>
+                <span class="text-2xl font-black text-amber-400">{{ overallPercentage }}%</span>
               </div>
-              <span class="text-3xl font-black text-amber-400">{{ overallPercentage }}%</span>
+              <h2 class="text-xl font-extrabold text-white mb-2">{{ completedCount }} of {{ totalCount }} Completed</h2>
+              
+              <!-- Progress Bar -->
+              <div class="w-full bg-slate-700/60 rounded-full h-3 p-0.5 border border-slate-600">
+                <div class="bg-gradient-to-r from-amber-500 to-emerald-400 h-2 rounded-full transition-all duration-500 shadow-md" :style="{ width: overallPercentage + '%' }"></div>
+              </div>
             </div>
 
-            <!-- Progress Bar -->
-            <div class="w-full bg-slate-700/60 rounded-full h-3.5 p-0.5 border border-slate-600">
-              <div class="bg-gradient-to-r from-amber-500 to-emerald-400 h-2.5 rounded-full transition-all duration-500 shadow-md" :style="{ width: overallPercentage + '%' }"></div>
+            <div class="flex flex-wrap gap-2 text-[11px] text-slate-300 pt-2.5 border-t border-slate-800">
+              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+                <strong class="text-amber-300">{{ pendingDiscussionsCount }}</strong> Discussions pending
+              </span>
+              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
+                <strong class="text-blue-300">{{ pendingStandardCount }}</strong> Assignments pending
+              </span>
+            </div>
+          </div>
+
+          <!-- Tracker 2: Current Week Progress -->
+          <div class="lg:col-span-4 bg-slate-900/60 border border-emerald-500/40 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-inner relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-300 border-b border-l border-emerald-500/40 text-[10px] font-bold px-2.5 py-0.5 rounded-bl-lg flex items-center gap-1">
+              <i class="fa-solid fa-clock text-[9px]"></i> Week {{ currentWeekInfo.weekNum }}
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1.5 pr-14">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-calendar-check"></i> Week Ending {{ currentWeekInfo.formatted }}
+                </span>
+                <span class="text-2xl font-black text-emerald-400">{{ currentWeekPercentage }}%</span>
+              </div>
+              <h2 class="text-xl font-extrabold text-white mb-2">{{ currentWeekCompletedCount }} of {{ currentWeekTotalCount }} Completed</h2>
+              
+              <!-- Progress Bar -->
+              <div class="w-full bg-slate-700/60 rounded-full h-3 p-0.5 border border-slate-600">
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-300 h-2 rounded-full transition-all duration-500 shadow-md" :style="{ width: currentWeekPercentage + '%' }"></div>
+              </div>
             </div>
 
-            <div class="flex flex-wrap gap-4 text-xs text-slate-300 pt-1">
-              <span class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span>
-                <strong>{{ pendingDiscussionsCount }}</strong> Discussion stages pending
+            <div class="flex flex-wrap gap-2 text-[11px] text-slate-300 pt-2.5 border-t border-slate-800">
+              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+                <strong class="text-amber-300">{{ currentWeekPendingCount }}</strong> Due this Sunday
               </span>
-              <span class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-blue-400 inline-block"></span>
-                <strong>{{ pendingStandardCount }}</strong> Assignments pending
-              </span>
-              <span class="flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
-                <strong>{{ completedCount }}</strong> Fully finished
+              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+                <strong class="text-emerald-300">{{ currentWeekCompletedCount }}</strong> Finished
               </span>
             </div>
           </div>
 
           <!-- Quick Class breakdown -->
-          <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 border-t lg:border-t-0 lg:border-l border-slate-700 pt-4 lg:pt-0 lg:pl-6">
+          <div class="lg:col-span-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-2.5">
             <div v-for="course in courses" :key="course.id" 
                  @click="selectedCourse = selectedCourse === course.code ? 'ALL' : course.code"
                  :class="[
-                   'p-3 rounded-xl border cursor-pointer transition flex flex-col justify-between',
+                   'p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between',
                    selectedCourse === course.code ? 'bg-slate-700/80 border-amber-400 shadow-md' : 'bg-slate-900/50 border-slate-700 hover:border-slate-500'
                  ]">
               <div class="flex items-center justify-between mb-1">
                 <span class="text-xs font-bold px-2 py-0.5 rounded text-white" :style="{ backgroundColor: course.color }">{{ course.code }}</span>
                 <span class="text-xs text-slate-400 font-mono">{{ getCourseProgress(course.code) }}%</span>
               </div>
-              <p class="text-xs font-medium text-slate-200 line-clamp-1 mb-2">{{ course.name }}</p>
+              <p class="text-xs font-medium text-slate-200 line-clamp-1 mb-1.5">{{ course.name }}</p>
               <div class="w-full bg-slate-800 rounded-full h-1.5">
                 <div class="h-1.5 rounded-full" :style="{ width: getCourseProgress(course.code) + '%', backgroundColor: course.color }"></div>
               </div>
@@ -276,12 +302,7 @@
                 </h3>
               </div>
 
-              <!-- Canvas Direct Link Button -->
-              <div v-if="item.canvasUrl" class="pt-1">
-                <a :href="item.canvasUrl" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 font-semibold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-2.5 py-1 rounded-md transition shadow-sm">
-                  <i class="fa-solid fa-graduation-cap"></i> Open Assignment in Canvas <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                </a>
-              </div>
+              
 
               <!-- Description / Notes -->
               <p v-if="item.notes" class="text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 leading-relaxed">
@@ -449,44 +470,52 @@
       </div>
     </div>
 
-    <!-- STREAMING_CHUNK:Adding CSV import modal... -->
-    <!-- CSV / Data Import Modal -->
-    <div v-if="showImportModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-xl w-full p-6 space-y-5 shadow-2xl relative">
+    <!-- Supabase Cloud Setup & Sync Modal -->
+    <div v-if="showCloudModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
         
-        <button @click="showImportModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+        <button @click="showCloudModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
           <i class="fa-solid fa-xmark"></i>
         </button>
 
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
-            <i class="fa-solid fa-file-csv"></i>
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-cloud-bolt"></i>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Import / Custom CSV Data</h3>
-            <p class="text-xs text-slate-400">Load schedule directly from your Fall 1 CSV file</p>
+            <h3 class="text-lg font-bold text-white">Supabase Cloud Real-Time Sync</h3>
+            <p class="text-xs text-slate-400">Sync your assignment progress across Mac, iPhone & Web</p>
           </div>
         </div>
 
-        <div class="space-y-3">
-          <label class="block text-xs font-semibold text-slate-300">Paste CSV Content or Upload File</label>
-          <input type="file" accept=".csv" @change="handleFileUpload" class="block w-full text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-amber-400 hover:file:bg-slate-600">
-          
-          <div class="text-center text-xs text-slate-500 font-semibold uppercase">Or paste raw text</div>
-          <textarea v-model="rawCsvText" rows="5" placeholder="Course, Week, Type, Title, ThuDue, SunDue, Notes, CanvasUrl..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs text-slate-200 font-mono focus:outline-none focus:border-amber-500 custom-scrollbar"></textarea>
+        <div class="space-y-4 text-xs text-slate-300">
+          <div class="space-y-1.5">
+            <label class="block font-semibold text-slate-200">Supabase Project URL</label>
+            <input v-model="supabaseUrl" type="text" placeholder="https://xyz.supabase.co" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="block font-semibold text-slate-200">Supabase Anon API Key</label>
+            <input v-model="supabaseAnonKey" type="password" placeholder="eyJhbGciOiJIUzI1Ni..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-amber-500">
+          </div>
+
+          <div v-if="cloudStatusMsg" :class="['p-2.5 rounded-lg border text-xs font-medium flex items-center gap-2', isCloudConnected ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-red-950/40 border-red-500/40 text-red-300']">
+            <i :class="['fa-solid', isCloudConnected ? 'fa-circle-check' : 'fa-triangle-exclamation']"></i>
+            <span>{{ cloudStatusMsg }}</span>
+          </div>
         </div>
 
-        <div class="flex justify-between items-center pt-2">
-          <button @click="resetToSnapshot" class="text-xs text-red-400 hover:text-red-300 underline font-medium">
-            Reset to Fall 1 Default
+        <div class="flex justify-between items-center pt-2 border-t border-slate-700/60">
+          <button @click="disconnectCloud" class="text-xs text-red-400 hover:text-red-300 underline font-medium">
+            Disconnect Cloud
           </button>
 
           <div class="flex space-x-2">
-            <button @click="showImportModal = false" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold text-xs rounded-xl transition">
-              Cancel
+            <button @click="showCloudModal = false" class="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold text-xs rounded-xl transition">
+              Close
             </button>
-            <button @click="parseCustomCSV" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition">
-              Import & Load Schedule
+            <button @click="saveCloudConfig" class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl transition shadow">
+              Connect & Sync
             </button>
           </div>
         </div>
@@ -503,6 +532,12 @@
     createApp({
       setup() {
         const showWebGuide = ref(false);
+        const showCloudModal = ref(false);
+        const supabaseUrl = ref(localStorage.getItem('dba_supabase_url') || 'https://hmxwmzrzvicgjppfqvhl.supabase.co');
+        const supabaseAnonKey = ref(localStorage.getItem('dba_supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhteHdtenJ6dmljZ2pwcGZxdmhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMjI2MDAsImV4cCI6MjEwMjg5ODYwMH0.TKk-CZgr7aI_tDkTO1Je9N4euOAfCrVbdcADs6LYEAI');
+        const isCloudConnected = ref(false);
+        const cloudStatusMsg = ref('');
+        let supabaseClient = null;
         const showImportModal = ref(false);
         const rawCsvText = ref('');
         const searchQuery = ref('');
@@ -521,371 +556,959 @@
         /* STREAMING_CHUNK:Loading default schedule snapshot and localStorage sync... */
         // Exact pre-populated dataset from the Fall 1 - 2026 tab with active Canvas URLs
         const defaultAssignmentsSnapshot = [
-          // ==================== DBA 7015 (Entrepreneurship) ====================
-          {
-            id: 'dba7015-w1-disc', courseCode: 'DBA 7015', week: 1, type: 'Discussion',
-            title: 'Module 1 Discussion: Entrepreneurial Mindset Index',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/discussion_topics/module1',
-            dueDateInitial: '2026-08-20', dueDateFinal: '2026-08-23',
-            notes: 'Initial post due Thursday Aug 20; 2 peer replies due Sunday Aug 23.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w1-assign', courseCode: 'DBA 7015', week: 1, type: 'Assignment',
-            title: 'Module 1 Assignment: Market Learning Styles',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/module1',
-            dueDateInitial: null, dueDateFinal: '2026-08-23', notes: 'Due Sunday Aug 23.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w1-reflect', courseCode: 'DBA 7015', week: 1, type: 'Assignment',
-            title: 'Week 1 Tech Live Reflection',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/tech-live-1',
-            dueDateInitial: null, dueDateFinal: '2026-08-23', notes: 'Live session reflection due Sunday Aug 23.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w2-disc', courseCode: 'DBA 7015', week: 2, type: 'Discussion',
-            title: 'Module 2 Discussion: Market Orientation',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/discussion_topics/module2',
-            dueDateInitial: '2026-08-27', dueDateFinal: '2026-08-30',
-            notes: 'Initial post due Thursday Aug 27; 2 peer replies due Sunday Aug 30.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w2-assign', courseCode: 'DBA 7015', week: 2, type: 'Assignment',
-            title: 'Module 2 Assignment: Entrepreneurial Orientation and Radical Innovation Orientation',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/module2',
-            dueDateInitial: null, dueDateFinal: '2026-08-30', notes: 'Due Sunday Aug 30.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w3-disc', courseCode: 'DBA 7015', week: 3, type: 'Discussion',
-            title: 'Module 3 Discussion: Experimentation',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/discussion_topics/module3',
-            dueDateInitial: '2026-09-03', dueDateFinal: '2026-09-06',
-            notes: 'Initial post due Thursday Sep 3; 2 peer replies due Sunday Sep 6.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w3-assign', courseCode: 'DBA 7015', week: 3, type: 'Assignment',
-            title: 'Module 3 Assignment: Minimum Viable New Market Entry',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/module3',
-            dueDateInitial: null, dueDateFinal: '2026-09-06', notes: 'Due Sunday Sep 6.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w4-disc', courseCode: 'DBA 7015', week: 4, type: 'Discussion',
-            title: 'Module 4 Discussion: Entrepreneurial Strategy',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/discussion_topics/module4',
-            dueDateInitial: '2026-09-10', dueDateFinal: '2026-09-13',
-            notes: 'Initial post due Thursday Sep 10; 2 peer replies due Sunday Sep 13.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w4-assign', courseCode: 'DBA 7015', week: 4, type: 'Assignment',
-            title: 'Module 4 Assignment: Risk Management',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/module4',
-            dueDateInitial: null, dueDateFinal: '2026-09-13', notes: 'Due Sunday Sep 13.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w4-reflect', courseCode: 'DBA 7015', week: 4, type: 'Assignment',
-            title: 'Week 4 Tech Live Reflection',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/tech-live-4',
-            dueDateInitial: null, dueDateFinal: '2026-09-13', notes: 'Due Sunday Sep 13.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w5-disc', courseCode: 'DBA 7015', week: 5, type: 'Discussion',
-            title: 'Module 5 Discussion: Sustainable Business Model',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/discussion_topics/module5',
-            dueDateInitial: '2026-09-17', dueDateFinal: '2026-09-20',
-            notes: 'Initial post due Thursday Sep 17; 2 peer replies due Sunday Sep 20.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w5-assign', courseCode: 'DBA 7015', week: 5, type: 'Assignment',
-            title: 'Module 5 Assignment: Innovated Business Model',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/module5',
-            dueDateInitial: null, dueDateFinal: '2026-09-20', notes: 'Due Sunday Sep 20.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w6-disc', courseCode: 'DBA 7015', week: 6, type: 'Discussion',
-            title: 'Module 6 Discussion: Entrepreneurial Ecosystem',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/discussion_topics/module6',
-            dueDateInitial: '2026-09-24', dueDateFinal: '2026-09-27',
-            notes: 'Initial post due Thursday Sep 24; 2 peer replies due Sunday Sep 27.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w6-assign', courseCode: 'DBA 7015', week: 6, type: 'Assignment',
-            title: 'Module 6 Assignment: Organization Growth Plan',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/module6',
-            dueDateInitial: null, dueDateFinal: '2026-09-27', notes: 'Due Sunday Sep 27.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w7-disc', courseCode: 'DBA 7015', week: 7, type: 'Discussion',
-            title: 'Module 7 Discussion: Global Market Support Factors',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/discussion_topics/module7',
-            dueDateInitial: '2026-10-01', dueDateFinal: '2026-10-04',
-            notes: 'Initial post due Thursday Oct 1; 2 peer replies due Sunday Oct 4.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w7-assign', courseCode: 'DBA 7015', week: 7, type: 'Assignment',
-            title: 'Module 7 Assignment: Global Agility Framework',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/module7',
-            dueDateInitial: null, dueDateFinal: '2026-10-04', notes: 'Due Sunday Oct 4.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w8-disc', courseCode: 'DBA 7015', week: 8, type: 'Discussion',
-            title: 'Module 8 Discussion: Ethics Quotient (EQ)',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/discussion_topics/module8',
-            dueDateInitial: '2026-10-08', dueDateFinal: '2026-10-11',
-            notes: 'Initial post due Thursday Oct 8; 2 peer replies due Sunday Oct 11.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7015-w8-reflect', courseCode: 'DBA 7015', week: 8, type: 'Assignment',
-            title: 'Week 8 Tech Live Reflection',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7015/assignments/tech-live-8',
-            dueDateInitial: null, dueDateFinal: '2026-10-11', notes: 'Due Sunday Oct 11.', stages: null, status: 'not_started'
-          },
+  {
+    "id": "dba7015-w1-disc",
+    "courseCode": "DBA 7015",
+    "week": 1,
+    "type": "Discussion",
+    "title": "Module 1 Discussion: Entrepreneurial Mindset Index",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270692/submissions/49784",
+    "dueDateInitial": "2026-08-20",
+    "dueDateFinal": "2026-08-23",
+    "notes": "Initial post due Thursday Aug 20; 2 peer replies due Sunday Aug 23.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w1-assign",
+    "courseCode": "DBA 7015",
+    "week": 1,
+    "type": "Assignment",
+    "title": "Module 1 Assignment: Market Learning Styles",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270693",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-23",
+    "notes": "Due Sunday Aug 23.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w1-reflect",
+    "courseCode": "DBA 7015",
+    "week": 1,
+    "type": "Assignment",
+    "title": "Week 1 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270701",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-23",
+    "notes": "Live session reflection due Sunday Aug 23.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w2-disc",
+    "courseCode": "DBA 7015",
+    "week": 2,
+    "type": "Discussion",
+    "title": "Module 2 Discussion: Market Orientation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270691/submissions/49784",
+    "dueDateInitial": "2026-08-27",
+    "dueDateFinal": "2026-08-30",
+    "notes": "Initial post due Thursday Aug 27; 2 peer replies due Sunday Aug 30.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w2-assign",
+    "courseCode": "DBA 7015",
+    "week": 2,
+    "type": "Assignment",
+    "title": "Module 2 Assignment: Entrepreneurial Orientation and Radical Innovation Orientation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270694",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-30",
+    "notes": "Due Sunday Aug 30.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w3-disc",
+    "courseCode": "DBA 7015",
+    "week": 3,
+    "type": "Discussion",
+    "title": "Module 3 Discussion: Experimentation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270690/submissions/49784",
+    "dueDateInitial": "2026-09-03",
+    "dueDateFinal": "2026-09-06",
+    "notes": "Initial post due Thursday Sep 3; 2 peer replies due Sunday Sep 6.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w3-assign",
+    "courseCode": "DBA 7015",
+    "week": 3,
+    "type": "Assignment",
+    "title": "Module 3 Assignment: Minimum Viable New Market Entry",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270695",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-06",
+    "notes": "Due Sunday Sep 6.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w4-disc",
+    "courseCode": "DBA 7015",
+    "week": 4,
+    "type": "Discussion",
+    "title": "Module 4 Discussion: Entrepreneurial Strategy",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270689/submissions/49784",
+    "dueDateInitial": "2026-09-10",
+    "dueDateFinal": "2026-09-13",
+    "notes": "Initial post due Thursday Sep 10; 2 peer replies due Sunday Sep 13.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w4-assign",
+    "courseCode": "DBA 7015",
+    "week": 4,
+    "type": "Assignment",
+    "title": "Module 4 Assignment: Risk Management",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270696",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-13",
+    "notes": "Due Sunday Sep 13.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w4-reflect",
+    "courseCode": "DBA 7015",
+    "week": 4,
+    "type": "Assignment",
+    "title": "Week 4 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270702",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-13",
+    "notes": "Due Sunday Sep 13.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w5-disc",
+    "courseCode": "DBA 7015",
+    "week": 5,
+    "type": "Discussion",
+    "title": "Module 5 Discussion: Sustainable Business Model",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270688/submissions/49784",
+    "dueDateInitial": "2026-09-17",
+    "dueDateFinal": "2026-09-20",
+    "notes": "Initial post due Thursday Sep 17; 2 peer replies due Sunday Sep 20.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w5-assign",
+    "courseCode": "DBA 7015",
+    "week": 5,
+    "type": "Assignment",
+    "title": "Module 5 Assignment: Innovated Business Model",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270697",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-20",
+    "notes": "Due Sunday Sep 20.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w6-disc",
+    "courseCode": "DBA 7015",
+    "week": 6,
+    "type": "Discussion",
+    "title": "Module 6 Discussion: Entrepreneurial Ecosystem",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270687/submissions/49784",
+    "dueDateInitial": "2026-09-24",
+    "dueDateFinal": "2026-09-27",
+    "notes": "Initial post due Thursday Sep 24; 2 peer replies due Sunday Sep 27.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w6-assign",
+    "courseCode": "DBA 7015",
+    "week": 6,
+    "type": "Assignment",
+    "title": "Module 6 Assignment: Organization Growth Plan",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270698",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-27",
+    "notes": "Due Sunday Sep 27.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w7-disc",
+    "courseCode": "DBA 7015",
+    "week": 7,
+    "type": "Discussion",
+    "title": "Module 7 Discussion: Global Market Support Factors",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270686/submissions/49784",
+    "dueDateInitial": "2026-10-01",
+    "dueDateFinal": "2026-10-04",
+    "notes": "Initial post due Thursday Oct 1; 2 peer replies due Sunday Oct 4.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w7-assign",
+    "courseCode": "DBA 7015",
+    "week": 7,
+    "type": "Assignment",
+    "title": "Module 7 Assignment: Global Agility Framework",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270699",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-04",
+    "notes": "Due Sunday Oct 4.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w8-disc",
+    "courseCode": "DBA 7015",
+    "week": 8,
+    "type": "Discussion",
+    "title": "Module 8 Discussion: Ethics Quotient (EQ)",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270685/submissions/49784",
+    "dueDateInitial": "2026-10-08",
+    "dueDateFinal": "2026-10-11",
+    "notes": "Initial post due Thursday Oct 8; 2 peer replies due Sunday Oct 11.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7015-w8-reflect",
+    "courseCode": "DBA 7015",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Week 8 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29832/assignments/270703",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-11",
+    "notes": "Due Sunday Oct 11.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w1-disc",
+    "courseCode": "DBA 7012",
+    "week": 1,
+    "type": "Discussion",
+    "title": "Module 1 Discussion: Welcome to Managing Multicultural and Global Teams!",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270672/submissions/49784",
+    "dueDateInitial": "2026-08-20",
+    "dueDateFinal": "2026-08-23",
+    "notes": "Initial post due Thursday Aug 20; 2 peer replies due Sunday Aug 23.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w1-assign",
+    "courseCode": "DBA 7012",
+    "week": 1,
+    "type": "Assignment",
+    "title": "Module 1 Assignment: Team 'Cultures' and Lifecycle",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270673",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-23",
+    "notes": "Due Sunday Aug 23.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w1-reflect",
+    "courseCode": "DBA 7012",
+    "week": 1,
+    "type": "Assignment",
+    "title": "Week 1 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270682",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-23",
+    "notes": "Due Sunday Aug 23.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w2-disc",
+    "courseCode": "DBA 7012",
+    "week": 2,
+    "type": "Discussion",
+    "title": "Module 2 Discussion: Global Mindset Self-Assessment",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270671/submissions/49784",
+    "dueDateInitial": "2026-08-27",
+    "dueDateFinal": "2026-08-30",
+    "notes": "Initial post due Thursday Aug 27; 2 peer replies due Sunday Aug 30.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w2-assign",
+    "courseCode": "DBA 7012",
+    "week": 2,
+    "type": "Assignment",
+    "title": "Module 2 Assignment: Leadership vs. Management Behaviors and 'Universal' Qualities",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270674",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-30",
+    "notes": "Due Sunday Aug 30.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w3-disc",
+    "courseCode": "DBA 7012",
+    "week": 3,
+    "type": "Discussion",
+    "title": "Module 3 Discussion: Structures and Processes for Diverse Team Success",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270670/submissions/49784",
+    "dueDateInitial": "2026-09-03",
+    "dueDateFinal": "2026-09-06",
+    "notes": "Initial post due Thursday Sep 3; 2 peer replies due Sunday Sep 6.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w3-assign",
+    "courseCode": "DBA 7012",
+    "week": 3,
+    "type": "Assignment",
+    "title": "Module 3 Assignment: Team Structures, Processes and Charter",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270675",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-06",
+    "notes": "Due Sunday Sep 6.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w4-disc",
+    "courseCode": "DBA 7012",
+    "week": 4,
+    "type": "Discussion",
+    "title": "Module 4 Discussion: Trust, Engagement & Motivation Across Cultures",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270669/submissions/49784",
+    "dueDateInitial": "2026-09-10",
+    "dueDateFinal": "2026-09-13",
+    "notes": "Initial post due Thursday Sep 10; 2 peer replies due Sunday Sep 13.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w4-assign",
+    "courseCode": "DBA 7012",
+    "week": 4,
+    "type": "Assignment",
+    "title": "Module 4 Assignment: Team Engagement Plan",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270676",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-13",
+    "notes": "Due Sunday Sep 13.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w4-reflect",
+    "courseCode": "DBA 7012",
+    "week": 4,
+    "type": "Assignment",
+    "title": "Week 4 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270683",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-13",
+    "notes": "Due Sunday Sep 13.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w5-disc",
+    "courseCode": "DBA 7012",
+    "week": 5,
+    "type": "Discussion",
+    "title": "Module 5 Discussion: Sources of Conflict on Diverse Teams",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270668/submissions/49784",
+    "dueDateInitial": "2026-09-17",
+    "dueDateFinal": "2026-09-20",
+    "notes": "Initial post due Thursday Sep 17; 2 peer replies due Sunday Sep 20.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w5-assign",
+    "courseCode": "DBA 7012",
+    "week": 5,
+    "type": "Assignment",
+    "title": "Module 5 Assignment: Scenario Analysis: Conflict on Diverse Teams",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270677",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-20",
+    "notes": "Due Sunday Sep 20.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w6-disc",
+    "courseCode": "DBA 7012",
+    "week": 6,
+    "type": "Discussion",
+    "title": "Module 6 Discussion: Five Dysfunctions of a Team Assessment",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270667/submissions/49784",
+    "dueDateInitial": "2026-09-24",
+    "dueDateFinal": "2026-09-27",
+    "notes": "Initial post due Thursday Sep 24; 2 peer replies due Sunday Sep 27.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w6-assign",
+    "courseCode": "DBA 7012",
+    "week": 6,
+    "type": "Assignment",
+    "title": "Module 6 Assignment: Management and Leadership Techniques to Maintain Positive and Productive Team Dynamics",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270678",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-27",
+    "notes": "Due Sunday Sep 27.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w7-disc",
+    "courseCode": "DBA 7012",
+    "week": 7,
+    "type": "Discussion",
+    "title": "Module 7 Discussion: Priority Areas for Team Development",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270666/submissions/49784",
+    "dueDateInitial": "2026-10-01",
+    "dueDateFinal": "2026-10-04",
+    "notes": "Initial post due Thursday Oct 1; 2 peer replies due Sunday Oct 4.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w7-assign",
+    "courseCode": "DBA 7012",
+    "week": 7,
+    "type": "Assignment",
+    "title": "Module 7 Assignment: Succession Planning for Multicultural and Global Teams",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270679",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-04",
+    "notes": "Due Sunday Oct 4.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w8-disc",
+    "courseCode": "DBA 7012",
+    "week": 8,
+    "type": "Discussion",
+    "title": "Module 8 Discussion: Course Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270665/submissions/49784",
+    "dueDateInitial": "2026-10-08",
+    "dueDateFinal": "2026-10-11",
+    "notes": "Initial post due Thursday Oct 8; 2 peer replies due Sunday Oct 11.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w8-assign",
+    "courseCode": "DBA 7012",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Module 8 Assignment: Navigating Real-World Challenges",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270680",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-11",
+    "notes": "Due Sunday Oct 11.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "dba7012-w8-reflect",
+    "courseCode": "DBA 7012",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Week 8 Tech Live Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29831/assignments/270684",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-11",
+    "notes": "Due Sunday Oct 11.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w1-disc",
+    "courseCode": "Global Practicum",
+    "week": 1,
+    "type": "Discussion",
+    "title": "Week 1: Global Leadership Capabilities Assessment Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270400/submissions/49784",
+    "dueDateInitial": "2026-08-20",
+    "dueDateFinal": "2026-08-23",
+    "notes": "Initial post Thursday Aug 20; peer replies Sunday Aug 23.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w2-disc",
+    "courseCode": "Global Practicum",
+    "week": 2,
+    "type": "Discussion",
+    "title": "Week 2: History & Culture Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270399/submissions/49784",
+    "dueDateInitial": "2026-08-27",
+    "dueDateFinal": "2026-08-30",
+    "notes": "Initial post Thursday Aug 27; peer replies Sunday Aug 30.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w2-journal",
+    "courseCode": "Global Practicum",
+    "week": 2,
+    "type": "Assignment",
+    "title": "Incident Journal - Pre-Departure Entry 1",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270410",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-08-30",
+    "notes": "Due Sunday Aug 30.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w3-disc",
+    "courseCode": "Global Practicum",
+    "week": 3,
+    "type": "Discussion",
+    "title": "Week 3: Society, Business, & Cultural Leadership Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270398/submissions/49784",
+    "dueDateInitial": "2026-09-03",
+    "dueDateFinal": "2026-09-06",
+    "notes": "Initial post Thursday Sep 3; peer replies Sunday Sep 6.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w5-journal",
+    "courseCode": "Global Practicum",
+    "week": 5,
+    "type": "Assignment",
+    "title": "Incident Journal - Pre-Departure Entry 2",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270411",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-20",
+    "notes": "Due Sunday Sep 20.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w5-disc",
+    "courseCode": "Global Practicum",
+    "week": 5,
+    "type": "Discussion",
+    "title": "Week 4: Travel itinerary and contact information Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270397/submissions/49784",
+    "dueDateInitial": "2026-09-17",
+    "dueDateFinal": "2026-09-20",
+    "notes": "Initial post Sep 17; peer replies Sep 20.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w6-journal",
+    "courseCode": "Global Practicum",
+    "week": 6,
+    "type": "Assignment",
+    "title": "Pre-Departure Journal 3: Disorientation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270407",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-09-27",
+    "notes": "Due Sunday Sep 27.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w7-journal",
+    "courseCode": "Global Practicum",
+    "week": 7,
+    "type": "Assignment",
+    "title": "Pre-Departure Journal 4: Critical Reflection",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270405",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-04",
+    "notes": "Due Sunday Oct 4.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-j5",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Incident Journal - Discourse and Learning",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270406",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-10-18",
+    "notes": "Due Oct 18.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-j6",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Incident Journal - Action and Integration",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270404",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-11-01",
+    "notes": "Due Nov 1.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-project",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Final Project - Presentation",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270403",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-11-04",
+    "notes": "Due Nov 4.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-paper",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Final Global Practicum Paper: Canada, Culture & Leadership in Practice",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270402",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-11-08",
+    "notes": "Due Nov 8.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-reentry",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Assignment",
+    "title": "Incident Journal - Post-Travel (Re-entry) Entry 1",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270408",
+    "dueDateInitial": null,
+    "dueDateFinal": "2026-11-08",
+    "notes": "Due Nov 8.",
+    "stages": null,
+    "status": "not_started"
+  },
+  {
+    "id": "practicum-w8-disc",
+    "courseCode": "Global Practicum",
+    "week": 8,
+    "type": "Discussion",
+    "title": "Week 8: Final Reflection Discussion",
+    "canvasUrl": "https://indianatech.instructure.com/courses/29712/assignments/270396/submissions/49784",
+    "dueDateInitial": "2026-11-05",
+    "dueDateFinal": "2026-11-08",
+    "notes": "Initial post Nov 5; peer replies Nov 8.",
+    "stages": {
+      "initial": {
+        "label": "Initial Post (Thu)",
+        "completed": false
+      },
+      "reply1": {
+        "label": "Peer Reply 1 (Sun)",
+        "completed": false
+      },
+      "reply2": {
+        "label": "Peer Reply 2 (Sun)",
+        "completed": false
+      }
+    },
+    "status": "not_started"
+  }
+];
 
-          // ==================== DBA 7012 (Multicultural & Global Teams) ====================
-          {
-            id: 'dba7012-w1-disc', courseCode: 'DBA 7012', week: 1, type: 'Discussion',
-            title: 'Module 1 Discussion: Welcome to Managing Multicultural and Global Teams!',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/discussion_topics/module1',
-            dueDateInitial: '2026-08-20', dueDateFinal: '2026-08-23',
-            notes: 'Initial post due Thursday Aug 20; 2 peer replies due Sunday Aug 23.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w1-assign', courseCode: 'DBA 7012', week: 1, type: 'Assignment',
-            title: "Module 1 Assignment: Team 'Cultures' and Lifecycle",
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/module1',
-            dueDateInitial: null, dueDateFinal: '2026-08-23', notes: 'Due Sunday Aug 23.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w1-reflect', courseCode: 'DBA 7012', week: 1, type: 'Assignment',
-            title: 'Week 1 Tech Live Reflection',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/tech-live-1',
-            dueDateInitial: null, dueDateFinal: '2026-08-23', notes: 'Due Sunday Aug 23.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w2-disc', courseCode: 'DBA 7012', week: 2, type: 'Discussion',
-            title: 'Module 2 Discussion: Global Mindset Self-Assessment',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/discussion_topics/module2',
-            dueDateInitial: '2026-08-27', dueDateFinal: '2026-08-30',
-            notes: 'Initial post due Thursday Aug 27; 2 peer replies due Sunday Aug 30.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w2-assign', courseCode: 'DBA 7012', week: 2, type: 'Assignment',
-            title: "Module 2 Assignment: Leadership vs. Management Behaviors and 'Universal' Qualities",
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/module2',
-            dueDateInitial: null, dueDateFinal: '2026-08-30', notes: 'Due Sunday Aug 30.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w3-disc', courseCode: 'DBA 7012', week: 3, type: 'Discussion',
-            title: 'Module 3 Discussion: Structures and Processes for Diverse Team Success',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/discussion_topics/module3',
-            dueDateInitial: '2026-09-03', dueDateFinal: '2026-09-06',
-            notes: 'Initial post due Thursday Sep 3; 2 peer replies due Sunday Sep 6.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w3-assign', courseCode: 'DBA 7012', week: 3, type: 'Assignment',
-            title: 'Module 3 Assignment: Team Structures, Processes and Charter',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/module3',
-            dueDateInitial: null, dueDateFinal: '2026-09-06', notes: 'Due Sunday Sep 6.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w4-disc', courseCode: 'DBA 7012', week: 4, type: 'Discussion',
-            title: 'Module 4 Discussion: Trust, Engagement & Motivation Across Cultures',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/discussion_topics/module4',
-            dueDateInitial: '2026-09-10', dueDateFinal: '2026-09-13',
-            notes: 'Initial post due Thursday Sep 10; 2 peer replies due Sunday Sep 13.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w4-assign', courseCode: 'DBA 7012', week: 4, type: 'Assignment',
-            title: 'Module 4 Assignment: Team Engagement Plan',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/module4',
-            dueDateInitial: null, dueDateFinal: '2026-09-13', notes: 'Due Sunday Sep 13.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w4-reflect', courseCode: 'DBA 7012', week: 4, type: 'Assignment',
-            title: 'Week 4 Tech Live Reflection',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/tech-live-4',
-            dueDateInitial: null, dueDateFinal: '2026-09-13', notes: 'Due Sunday Sep 13.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w5-disc', courseCode: 'DBA 7012', week: 5, type: 'Discussion',
-            title: 'Module 5 Discussion: Sources of Conflict on Diverse Teams',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/discussion_topics/module5',
-            dueDateInitial: '2026-09-17', dueDateFinal: '2026-09-20',
-            notes: 'Initial post due Thursday Sep 17; 2 peer replies due Sunday Sep 20.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w5-assign', courseCode: 'DBA 7012', week: 5, type: 'Assignment',
-            title: 'Module 5 Assignment: Scenario Analysis: Conflict on Diverse Teams',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/module5',
-            dueDateInitial: null, dueDateFinal: '2026-09-20', notes: 'Due Sunday Sep 20.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w6-disc', courseCode: 'DBA 7012', week: 6, type: 'Discussion',
-            title: 'Module 6 Discussion: Five Dysfunctions of a Team Assessment',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/discussion_topics/module6',
-            dueDateInitial: '2026-09-24', dueDateFinal: '2026-09-27',
-            notes: 'Initial post due Thursday Sep 24; 2 peer replies due Sunday Sep 27.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w6-assign', courseCode: 'DBA 7012', week: 6, type: 'Assignment',
-            title: 'Module 6 Assignment: Management and Leadership Techniques to Maintain Positive and Productive Team Dynamics',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/module6',
-            dueDateInitial: null, dueDateFinal: '2026-09-27', notes: 'Due Sunday Sep 27.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w7-disc', courseCode: 'DBA 7012', week: 7, type: 'Discussion',
-            title: 'Module 7 Discussion: Priority Areas for Team Development',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/discussion_topics/module7',
-            dueDateInitial: '2026-10-01', dueDateFinal: '2026-10-04',
-            notes: 'Initial post due Thursday Oct 1; 2 peer replies due Sunday Oct 4.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w7-assign', courseCode: 'DBA 7012', week: 7, type: 'Assignment',
-            title: 'Module 7 Assignment: Succession Planning for Multicultural and Global Teams',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/module7',
-            dueDateInitial: null, dueDateFinal: '2026-10-04', notes: 'Due Sunday Oct 4.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w8-disc', courseCode: 'DBA 7012', week: 8, type: 'Discussion',
-            title: 'Module 8 Discussion: Course Reflection',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/discussion_topics/module8',
-            dueDateInitial: '2026-10-08', dueDateFinal: '2026-10-11',
-            notes: 'Initial post due Thursday Oct 8; 2 peer replies due Sunday Oct 11.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w8-assign', courseCode: 'DBA 7012', week: 8, type: 'Assignment',
-            title: 'Module 8 Assignment: Navigating Real-World Challenges',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/module8',
-            dueDateInitial: null, dueDateFinal: '2026-10-11', notes: 'Due Sunday Oct 11.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'dba7012-w8-reflect', courseCode: 'DBA 7012', week: 8, type: 'Assignment',
-            title: 'Week 8 Tech Live Reflection',
-            canvasUrl: 'https://indianatech.instructure.com/courses/dba7012/assignments/tech-live-8',
-            dueDateInitial: null, dueDateFinal: '2026-10-11', notes: 'Due Sunday Oct 11.', stages: null, status: 'not_started'
-          },
-
-          // ==================== Global Practicum ====================
-          {
-            id: 'practicum-w1-disc', courseCode: 'Global Practicum', week: 1, type: 'Discussion',
-            title: 'Week 1: Global Leadership Capabilities Assessment Discussion',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/discussion_topics/week1',
-            dueDateInitial: '2026-08-20', dueDateFinal: '2026-08-23',
-            notes: 'Initial post Thursday Aug 20; peer replies Sunday Aug 23.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'practicum-w2-disc', courseCode: 'Global Practicum', week: 2, type: 'Discussion',
-            title: 'Week 2: History & Culture Discussion',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/discussion_topics/week2',
-            dueDateInitial: '2026-08-27', dueDateFinal: '2026-08-30',
-            notes: 'Initial post Thursday Aug 27; peer replies Sunday Aug 30.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'practicum-w2-journal', courseCode: 'Global Practicum', week: 2, type: 'Assignment',
-            title: 'Incident Journal - Pre-Departure Entry 1',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/assignments/journal1',
-            dueDateInitial: null, dueDateFinal: '2026-08-30', notes: 'Due Sunday Aug 30.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'practicum-w3-disc', courseCode: 'Global Practicum', week: 3, type: 'Discussion',
-            title: 'Week 3: Society, Business, & Cultural Leadership Discussion',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/discussion_topics/week3',
-            dueDateInitial: '2026-09-03', dueDateFinal: '2026-09-06',
-            notes: 'Initial post Thursday Sep 3; peer replies Sunday Sep 6.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'practicum-w5-journal', courseCode: 'Global Practicum', week: 5, type: 'Assignment',
-            title: 'Incident Journal - Pre-Departure Entry 2',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/assignments/journal2',
-            dueDateInitial: null, dueDateFinal: '2026-09-20', notes: 'Due Sunday Sep 20.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'practicum-w5-disc', courseCode: 'Global Practicum', week: 5, type: 'Discussion',
-            title: 'Week 4: Travel itinerary and contact information Discussion',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/discussion_topics/week4',
-            dueDateInitial: '2026-09-17', dueDateFinal: '2026-09-20',
-            notes: 'Initial post Sep 17; peer replies Sep 20.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          },
-          {
-            id: 'practicum-w6-journal', courseCode: 'Global Practicum', week: 6, type: 'Assignment',
-            title: 'Pre-Departure Journal 3: Disorientation',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/assignments/journal3',
-            dueDateInitial: null, dueDateFinal: '2026-09-27', notes: 'Due Sunday Sep 27.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'practicum-w7-journal', courseCode: 'Global Practicum', week: 7, type: 'Assignment',
-            title: 'Pre-Departure Journal 4: Critical Reflection',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/assignments/journal4',
-            dueDateInitial: null, dueDateFinal: '2026-10-04', notes: 'Due Sunday Oct 4.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'practicum-w8-j5', courseCode: 'Global Practicum', week: 8, type: 'Assignment',
-            title: 'Incident Journal - Discourse and Learning',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/assignments/journal5',
-            dueDateInitial: null, dueDateFinal: '2026-10-18', notes: 'Due Oct 18.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'practicum-w8-j6', courseCode: 'Global Practicum', week: 8, type: 'Assignment',
-            title: 'Incident Journal - Action and Integration',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/assignments/journal6',
-            dueDateInitial: null, dueDateFinal: '2026-11-01', notes: 'Due Nov 1.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'practicum-w8-project', courseCode: 'Global Practicum', week: 8, type: 'Assignment',
-            title: 'Final Project - Presentation',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/assignments/final-presentation',
-            dueDateInitial: null, dueDateFinal: '2026-11-04', notes: 'Due Nov 4.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'practicum-w8-paper', courseCode: 'Global Practicum', week: 8, type: 'Assignment',
-            title: 'Final Global Practicum Paper: Canada, Culture & Leadership in Practice',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/assignments/final-paper',
-            dueDateInitial: null, dueDateFinal: '2026-11-08', notes: 'Due Nov 8.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'practicum-w8-reentry', courseCode: 'Global Practicum', week: 8, type: 'Assignment',
-            title: 'Incident Journal - Post-Travel (Re-entry) Entry 1',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/assignments/reentry-journal',
-            dueDateInitial: null, dueDateFinal: '2026-11-08', notes: 'Due Nov 8.', stages: null, status: 'not_started'
-          },
-          {
-            id: 'practicum-w8-disc', courseCode: 'Global Practicum', week: 8, type: 'Discussion',
-            title: 'Week 8: Final Reflection Discussion',
-            canvasUrl: 'https://indianatech.instructure.com/courses/practicum/discussion_topics/week8',
-            dueDateInitial: '2026-11-05', dueDateFinal: '2026-11-08',
-            notes: 'Initial post Nov 5; peer replies Nov 8.',
-            stages: { initial: { label: 'Initial Post (Thu)', completed: false }, reply1: { label: 'Peer Reply 1 (Sun)', completed: false }, reply2: { label: 'Peer Reply 2 (Sun)', completed: false } }, status: 'not_started'
-          }
-        ];
-
-        const assignments = ref([]);
+        const assignments = ref(JSON.parse(JSON.stringify(defaultAssignmentsSnapshot)));
 
         // Storage with version key
         const loadFromLocalStorage = () => {
-          const stored = localStorage.getItem('indiana_tech_dba_fall1_v2');
+          const stored = localStorage.getItem('indiana_tech_dba_fall1_v4');
           if (stored) {
             try {
-              assignments.value = JSON.parse(stored);
+              const parsed = JSON.parse(stored);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                assignments.value = parsed;
+              } else {
+                assignments.value = JSON.parse(JSON.stringify(defaultAssignmentsSnapshot));
+              }
             } catch (e) {
-              assignments.value = defaultAssignmentsSnapshot;
+              assignments.value = JSON.parse(JSON.stringify(defaultAssignmentsSnapshot));
             }
           } else {
             assignments.value = JSON.parse(JSON.stringify(defaultAssignmentsSnapshot));
@@ -893,7 +1516,7 @@
         };
 
         const saveToLocalStorage = () => {
-          localStorage.setItem('indiana_tech_dba_fall1_v2', JSON.stringify(assignments.value));
+          localStorage.setItem('indiana_tech_dba_fall1_v4', JSON.stringify(assignments.value));
         };
 
         watch(assignments, () => {
@@ -916,10 +1539,12 @@
           } else {
             item.status = 'not_started';
           }
+          syncItemToCloud(item);
         };
 
         const toggleStandardAssignment = (item) => {
           item.status = item.status === 'completed' ? 'not_started' : 'completed';
+          syncItemToCloud(item);
         };
 
         const isFullyComplete = (item) => {
@@ -989,6 +1614,62 @@
 
         const pendingDiscussionsCount = computed(() => {
           return assignments.value.filter(item => item.type === 'Discussion' && !isFullyComplete(item)).length;
+        });
+
+                // Week Sunday End Dates lookup
+        const weekEndDates = {
+          1: 'Sunday Aug 23rd',
+          2: 'Sunday Aug 30th',
+          3: 'Sunday Sep 6th',
+          4: 'Sunday Sep 13th',
+          5: 'Sunday Sep 20th',
+          6: 'Sunday Sep 27th',
+          7: 'Sunday Oct 4th',
+          8: 'Sunday Oct 11th'
+        };
+
+        const currentWeekInfo = computed(() => {
+          if (selectedWeek.value !== 'ALL') {
+            const w = selectedWeek.value;
+            return {
+              weekNum: w,
+              formatted: weekEndDates[w] || ('Sunday Week ' + w)
+            };
+          }
+          const todayStr = new Date().toISOString().split('T')[0];
+          let weekNum = 1;
+          if (todayStr <= '2026-08-23') weekNum = 1;
+          else if (todayStr <= '2026-08-30') weekNum = 2;
+          else if (todayStr <= '2026-09-06') weekNum = 3;
+          else if (todayStr <= '2026-09-13') weekNum = 4;
+          else if (todayStr <= '2026-09-20') weekNum = 5;
+          else if (todayStr <= '2026-09-27') weekNum = 6;
+          else if (todayStr <= '2026-10-04') weekNum = 7;
+          else weekNum = 8;
+
+          return {
+            weekNum,
+            formatted: weekEndDates[weekNum] || 'Sunday Aug 23rd'
+          };
+        });
+
+        const currentWeekAssignments = computed(() => {
+          return assignments.value.filter(i => i.week === currentWeekInfo.value.weekNum);
+        });
+
+        const currentWeekTotalCount = computed(() => currentWeekAssignments.value.length);
+
+        const currentWeekCompletedCount = computed(() => {
+          return currentWeekAssignments.value.filter(i => isFullyComplete(i)).length;
+        });
+
+        const currentWeekPercentage = computed(() => {
+          if (currentWeekTotalCount.value === 0) return 0;
+          return Math.round((currentWeekCompletedCount.value / currentWeekTotalCount.value) * 100);
+        });
+
+        const currentWeekPendingCount = computed(() => {
+          return currentWeekTotalCount.value - currentWeekCompletedCount.value;
         });
 
         const pendingStandardCount = computed(() => {
@@ -1094,11 +1775,88 @@
           }
         };
 
+        const syncItemToCloud = async (item) => {
+          if (!supabaseClient || !isCloudConnected.value) return;
+          try {
+            await supabaseClient.from('assignment_progress').upsert({
+              id: item.id,
+              status: item.status,
+              stages: item.stages,
+              updated_at: new Date().toISOString()
+            });
+          } catch (e) {
+            console.error('Cloud upsert error:', e);
+          }
+        };
+
+        const initSupabase = async () => {
+          if (supabaseUrl.value && supabaseAnonKey.value && window.supabase) {
+            try {
+              supabaseClient = window.supabase.createClient(supabaseUrl.value.trim(), supabaseAnonKey.value.trim());
+              const { data, error } = await supabaseClient.from('assignment_progress').select('*');
+              if (error) throw error;
+              
+              isCloudConnected.value = true;
+              cloudStatusMsg.value = 'Connected to Supabase! Real-time sync is active.';
+              
+              if (data && data.length > 0) {
+                data.forEach(row => {
+                  const match = assignments.value.find(a => a.id === row.id);
+                  if (match) {
+                    if (row.status) match.status = row.status;
+                    if (row.stages) match.stages = row.stages;
+                  }
+                });
+                saveToLocalStorage();
+              }
+            } catch (err) {
+              console.error('Supabase init error:', err);
+              isCloudConnected.value = false;
+              cloudStatusMsg.value = 'Connection failed: ' + (err.message || 'Check URL & Key');
+            }
+          }
+        };
+
+        const saveCloudConfig = async () => {
+          if (!supabaseUrl.value.trim() || !supabaseAnonKey.value.trim()) {
+            cloudStatusMsg.value = 'Please enter both Supabase URL and Anon Key.';
+            return;
+          }
+          localStorage.setItem('dba_supabase_url', supabaseUrl.value.trim());
+          localStorage.setItem('dba_supabase_key', supabaseAnonKey.value.trim());
+          await initSupabase();
+          if (isCloudConnected.value) {
+            setTimeout(() => { showCloudModal.value = false; }, 1200);
+          }
+        };
+
+        const disconnectCloud = () => {
+          localStorage.removeItem('dba_supabase_url');
+          localStorage.removeItem('dba_supabase_key');
+          supabaseUrl.value = '';
+          supabaseAnonKey.value = '';
+          supabaseClient = null;
+          isCloudConnected.value = false;
+          cloudStatusMsg.value = 'Disconnected from Supabase.';
+        };
+
         onMounted(() => {
           loadFromLocalStorage();
         });
 
         return {
+          showCloudModal,
+          supabaseUrl,
+          supabaseAnonKey,
+          isCloudConnected,
+          cloudStatusMsg,
+          saveCloudConfig,
+          disconnectCloud,
+          currentWeekInfo,
+          currentWeekTotalCount,
+          currentWeekCompletedCount,
+          currentWeekPercentage,
+          currentWeekPendingCount,
           showWebGuide,
           showImportModal,
           rawCsvText,
