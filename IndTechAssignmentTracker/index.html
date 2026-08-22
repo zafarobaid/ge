@@ -87,69 +87,43 @@
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
-          <!-- Tracker 1: Overall Fall 1 Progress -->
-          <div class="lg:col-span-4 bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-inner">
-            <div>
-              <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <i class="fa-solid fa-chart-line"></i> Fall 1 - 2026 Progress
-                </span>
-                <span class="text-2xl font-black text-amber-400">{{ overallPercentage }}%</span>
-              </div>
-              <h2 class="text-xl font-extrabold text-white mb-2">{{ completedCount }} of {{ totalCount }} Completed</h2>
-              
-              <!-- Progress Bar -->
-              <div class="w-full bg-slate-700/60 rounded-full h-3 p-0.5 border border-slate-600">
-                <div class="bg-gradient-to-r from-amber-500 to-emerald-400 h-2 rounded-full transition-all duration-500 shadow-md" :style="{ width: overallPercentage + '%' }"></div>
-              </div>
-            </div>
-
-            <div class="flex flex-wrap gap-2 text-[11px] text-slate-300 pt-2.5 border-t border-slate-800">
-              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
-                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
-                <strong class="text-amber-300">{{ pendingDiscussionsCount }}</strong> Discussions pending
-              </span>
-              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
-                <span class="w-2 h-2 rounded-full bg-blue-400 inline-block"></span>
-                <strong class="text-blue-300">{{ pendingStandardCount }}</strong> Assignments pending
-              </span>
-            </div>
-          </div>
-
-          <!-- Tracker 2: Current Week Progress -->
-          <div class="lg:col-span-4 bg-slate-900/60 border border-emerald-500/40 rounded-2xl p-4 flex flex-col justify-between space-y-3 shadow-inner relative overflow-hidden">
-            <div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-300 border-b border-l border-emerald-500/40 text-[10px] font-bold px-2.5 py-0.5 rounded-bl-lg flex items-center gap-1">
-              <i class="fa-solid fa-clock text-[9px]"></i> Week {{ currentWeekInfo.weekNum }}
+          <!-- Current Week Progress Tracker (Prominent) -->
+          <div class="lg:col-span-7 bg-slate-900/60 border border-emerald-500/40 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-inner relative overflow-hidden">
+            <div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-300 border-b border-l border-emerald-500/40 text-xs font-bold px-3 py-1 rounded-bl-xl flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-clock text-emerald-400"></i> Week {{ currentWeekInfo.weekNum }} Active
             </div>
             <div>
-              <div class="flex items-center justify-between mb-1.5 pr-14">
-                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <i class="fa-solid fa-calendar-check"></i> Week Ending {{ currentWeekInfo.formatted }}
+              <div class="flex items-center justify-between mb-2 pr-28">
+                <span class="text-xs sm:text-sm font-extrabold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
+                  <i class="fa-solid fa-calendar-check text-base"></i> Week Ending {{ currentWeekInfo.formatted }}
                 </span>
-                <span class="text-2xl font-black text-emerald-400">{{ currentWeekPercentage }}%</span>
+                <span class="text-3xl font-black text-emerald-400">{{ currentWeekPercentage }}%</span>
               </div>
-              <h2 class="text-xl font-extrabold text-white mb-2">{{ currentWeekCompletedCount }} of {{ currentWeekTotalCount }} Completed</h2>
+              <h2 class="text-2xl font-black text-white mb-3">{{ currentWeekCompletedCount }} of {{ currentWeekTotalCount }} Completed</h2>
               
               <!-- Progress Bar -->
-              <div class="w-full bg-slate-700/60 rounded-full h-3 p-0.5 border border-slate-600">
-                <div class="bg-gradient-to-r from-emerald-500 to-teal-300 h-2 rounded-full transition-all duration-500 shadow-md" :style="{ width: currentWeekPercentage + '%' }"></div>
+              <div class="w-full bg-slate-700/60 rounded-full h-3.5 p-0.5 border border-slate-600 shadow-inner">
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-300 h-2.5 rounded-full transition-all duration-500 shadow-md" :style="{ width: currentWeekPercentage + '%' }"></div>
               </div>
             </div>
 
-            <div class="flex flex-wrap gap-2 text-[11px] text-slate-300 pt-2.5 border-t border-slate-800">
-              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
-                <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
-                <strong class="text-amber-300">{{ currentWeekPendingCount }}</strong> Due this Sunday
-              </span>
-              <span class="bg-slate-800/90 px-2.5 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-                <strong class="text-emerald-300">{{ currentWeekCompletedCount }}</strong> Finished
-              </span>
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300 pt-3 border-t border-slate-800">
+              <div class="flex flex-wrap gap-2">
+                <span class="bg-slate-800/90 px-3 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+                  <strong class="text-amber-300">{{ currentWeekPendingCount }}</strong> Due this Sunday
+                </span>
+                <span class="bg-slate-800/90 px-3 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
+                  <strong class="text-emerald-300">{{ currentWeekCompletedCount }}</strong> Finished
+                </span>
+              </div>
+              <span class="text-[11px] text-slate-400 font-medium italic">All weekly tasks due each Sunday</span>
             </div>
           </div>
 
           <!-- Quick Class breakdown -->
-          <div class="lg:col-span-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-2.5">
+          <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-2.5">
             <div v-for="course in courses" :key="course.id" 
                  @click="selectedCourse = selectedCourse === course.code ? 'ALL' : course.code"
                  :class="[
@@ -204,6 +178,19 @@
         <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
           <div class="flex flex-wrap items-center gap-2 text-xs">
             <span class="text-slate-400 font-medium">Filters:</span>
+
+            <!-- Quick Pending Actions Filter Button -->
+            <button @click="selectedStatus = selectedStatus === 'PENDING' ? 'ALL' : 'PENDING'"
+                    :class="[
+                      'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border shadow-sm cursor-pointer',
+                      selectedStatus === 'PENDING'
+                        ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-amber-500/20'
+                        : 'bg-amber-500/10 text-amber-300 border-amber-500/40 hover:bg-amber-500/20'
+                    ]">
+              <i class="fa-solid fa-bolt text-amber-400"></i>
+              <span>Pending Actions</span>
+              <span v-if="selectedStatus === 'PENDING'" class="bg-slate-950/40 text-amber-200 text-[10px] px-1.5 py-0.2 rounded-full font-black">ON</span>
+            </button>
             
             <!-- Course Filter Dropdown -->
             <select v-model="selectedCourse" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
@@ -1775,6 +1762,23 @@
           }
         };
 
+        const pushAllToCloud = async () => {
+          if (!supabaseClient || !isCloudConnected.value) return;
+          try {
+            const itemsToPush = assignments.value.filter(i => i.status !== 'not_started' || (i.stages && (i.stages.initial.completed || i.stages.reply1.completed || i.stages.reply2.completed))).map(item => ({
+              id: item.id,
+              status: item.status,
+              stages: item.stages,
+              updated_at: new Date().toISOString()
+            }));
+            if (itemsToPush.length > 0) {
+              await supabaseClient.from('assignment_progress').upsert(itemsToPush);
+            }
+          } catch (e) {
+            console.error('Push all to cloud error:', e);
+          }
+        };
+
         const syncItemToCloud = async (item) => {
           if (!supabaseClient || !isCloudConnected.value) return;
           try {
@@ -1809,6 +1813,8 @@
                 });
                 saveToLocalStorage();
               }
+              // Push local progress to cloud if cloud was empty or missing items
+              await pushAllToCloud();
             } catch (err) {
               console.error('Supabase init error:', err);
               isCloudConnected.value = false;
@@ -1826,6 +1832,7 @@
           localStorage.setItem('dba_supabase_key', supabaseAnonKey.value.trim());
           await initSupabase();
           if (isCloudConnected.value) {
+            await pushAllToCloud();
             setTimeout(() => { showCloudModal.value = false; }, 1200);
           }
         };
@@ -1845,6 +1852,7 @@
         });
 
         return {
+          pushAllToCloud,
           showCloudModal,
           supabaseUrl,
           supabaseAnonKey,
