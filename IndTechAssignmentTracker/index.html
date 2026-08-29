@@ -10,6 +10,19 @@
   <link rel="apple-touch-icon" href="favicon.ico">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  <script>
+    // Immediately apply theme before DOM renders to prevent FOUC
+    if (localStorage.getItem('dba_theme') === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Google Fonts: Inter -->
@@ -20,63 +33,90 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
+    html {
+      font-size: 16px;
+    }
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
+      line-height: 1.5;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
-    .custom-scrollbar::-webkit-scrollbar-track {
+    html.dark .custom-scrollbar::-webkit-scrollbar-track {
       background: #1e293b;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
+    html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
       background: #475569;
       border-radius: 4px;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
       background: #64748b;
+    }
+    html:not(.dark) .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    html:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    html:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
   </style>
 </head>
-<body class="min-h-screen bg-slate-900 text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-900">
+<body class="min-h-screen bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 flex flex-col selection:bg-amber-500 selection:text-slate-900 transition-colors duration-200">
   <div id="app" class="flex-grow flex flex-col min-h-screen">
     
     <!-- STREAMING_CHUNK:Rendering navigation header and Canvas links... -->
     <!-- Header / Navbar -->
-    <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-30 shadow-md">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+    <header class="bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-sm transition-colors duration-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
         
-        <div class="flex items-center space-x-3">
-          <img src="data:image/png;base64,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" alt="Indiana Tech Logo" class="h-9 sm:h-11 w-auto object-contain drop-shadow-md">
-          <div>
-            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
-              Indiana Tech DBA <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs px-2 py-0.5 rounded-full font-semibold">Fall 1 - 2026</span>
-            </h1>
-            <p class="text-xs text-slate-400 hidden sm:block">Assignment & Multi-Stage Discussion Tracker</p>
+        <div class="flex items-center space-x-3 min-w-0 flex-1">
+          <!-- Indiana Tech Logo: strictly sized to avoid horizontal squeezing -->
+          <img :src="isDarkMode ? 'indiana_tech_logo_white.png' : 'indiana_tech_logo_black.png'" 
+               alt="Indiana Tech Logo" 
+               class="h-8 sm:h-9 w-auto max-w-[140px] sm:max-w-[170px] object-contain flex-shrink-0 transition-all">
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+              <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 dark:text-white whitespace-nowrap">
+                Indiana Tech DBA
+              </h1>
+              <span class="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">Fall 1 - 2026</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block truncate">Assignment & Multi-Stage Discussion Tracker</p>
           </div>
         </div>
 
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2 flex-shrink-0">
+          <!-- Dark / Light Theme Toggle Button -->
+          <button @click="toggleTheme" 
+                  :title="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+                  class="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border transition-all flex items-center gap-1.5 shadow-sm bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-amber-300 dark:border-slate-700 cursor-pointer">
+            <i :class="['fa-solid text-sm transition-transform duration-200', isDarkMode ? 'fa-sun text-amber-400' : 'fa-moon text-indigo-600']"></i>
+            <span class="hidden sm:inline font-bold">{{ isDarkMode ? 'Light Mode' : 'Dark Mode' }}</span>
+          </button>
+
           <!-- Canvas Inbox Direct Link -->
-          <a href="https://indianatech.instructure.com/conversations#filter=type=inbox" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 text-xs sm:text-sm font-medium bg-red-900/40 hover:bg-red-800/60 text-red-200 rounded-lg border border-red-700/50 transition flex items-center gap-1.5 shadow-sm">
-            <i class="fa-solid fa-envelope text-red-400"></i>
-            <span class="hidden md:inline">Canvas Inbox</span>
+          <a href="https://indianatech.instructure.com/conversations#filter=type=inbox" target="_blank" rel="noopener noreferrer" 
+             class="px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-semibold bg-red-50 hover:bg-red-100 text-red-700 border-red-200 dark:bg-red-900/40 dark:hover:bg-red-800/60 dark:text-red-200 dark:border-red-700/50 rounded-xl border transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-envelope text-red-500 dark:text-red-400 text-xs sm:text-sm"></i>
+            <span class="hidden sm:inline">Canvas Inbox</span>
           </a>
 
           <!-- Cloud Sync Modal Button -->
-          <button @click="showCloudModal = true" :class="['px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg border transition flex items-center gap-1.5 shadow-sm', isCloudConnected ? 'bg-emerald-900/40 text-emerald-300 border-emerald-600/50 hover:bg-emerald-800/60' : 'bg-amber-950/40 text-amber-300 border-amber-600/50 hover:bg-amber-900/60']">
-            <i :class="['fa-solid', isCloudConnected ? 'fa-cloud-check text-emerald-400' : 'fa-cloud-arrow-up text-amber-400']"></i>
-            <span class="hidden md:inline">{{ isCloudConnected ? 'Cloud Synced' : 'Connect Cloud' }}</span>
+          <button @click="showCloudModal = true" 
+                  :class="['px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-xl border transition flex items-center gap-1.5 shadow-sm cursor-pointer', 
+                           isCloudConnected 
+                             ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-600/50 dark:hover:bg-emerald-800/60' 
+                             : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-600/50 dark:hover:bg-amber-900/60']">
+            <i :class="['fa-solid text-xs sm:text-sm', isCloudConnected ? 'fa-cloud-check text-emerald-600 dark:text-emerald-400' : 'fa-cloud-arrow-up text-amber-600 dark:text-amber-400']"></i>
+            <span class="hidden sm:inline">{{ isCloudConnected ? 'Cloud Synced' : 'Connect Cloud' }}</span>
           </button>
-
-          <!-- Web Access / Mobile Sync Info Modal Button -->
-          <button @click="showWebGuide = true" class="px-3 py-1.5 text-xs sm:text-sm font-medium bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg border border-slate-600 transition flex items-center gap-1.5">
-            <i class="fa-solid fa-mobile-screen-button text-amber-400"></i>
-            <span class="hidden md:inline">Mobile & Web Sync</span>
-          </button>        </div>
+        </div>
 
       </div>
     </header>
@@ -85,62 +125,105 @@
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
       <!-- Overall Progress & Dashboard Banner -->
-      <div class="bg-slate-800 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-xl relative overflow-hidden space-y-6">
-        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -left-10 -top-10 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm dark:shadow-md relative overflow-hidden transition-colors">
         
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
           
-          <!-- Current Week Progress Tracker (Prominent) -->
-          <div class="lg:col-span-7 bg-slate-900/60 border border-emerald-500/40 rounded-2xl p-5 flex flex-col justify-between space-y-4 shadow-inner relative overflow-hidden">
-            <div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-300 border-b border-l border-emerald-500/40 text-xs font-bold px-3 py-1 rounded-bl-xl flex items-center gap-1.5 shadow-sm">
-              <i class="fa-solid fa-clock text-emerald-400"></i> Week {{ currentWeekInfo.weekNum }} Active
+          <!-- Current Week Progress Tracker (Compact) -->
+          <div class="lg:col-span-4 bg-emerald-50/60 dark:bg-slate-900/60 border border-emerald-300/80 dark:border-emerald-500/40 rounded-xl p-3.5 flex flex-col justify-between space-y-2 shadow-sm dark:shadow-inner relative overflow-hidden transition-colors">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-check text-xs"></i> Week Ending {{ currentWeekInfo.formatted }}
+              </span>
+              <span class="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-400/40 text-[11px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                <i class="fa-solid fa-clock text-[10px]"></i> Week {{ currentWeekInfo.weekNum }} Active
+              </span>
             </div>
+
             <div>
-              <div class="flex items-center justify-between mb-2 pr-28">
-                <span class="text-xs sm:text-sm font-extrabold text-emerald-400 uppercase tracking-wider flex items-center gap-2">
-                  <i class="fa-solid fa-calendar-check text-base"></i> Week Ending {{ currentWeekInfo.formatted }}
-                </span>
-                <span class="text-3xl font-black text-emerald-400">{{ currentWeekPercentage }}%</span>
+              <div class="flex items-baseline justify-between mb-1">
+                <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white">{{ currentWeekCompletedCount }} of {{ currentWeekTotalCount }} Completed</h2>
+                <span class="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">{{ currentWeekPercentage }}%</span>
               </div>
-              <h2 class="text-2xl font-black text-white mb-3">{{ currentWeekCompletedCount }} of {{ currentWeekTotalCount }} Completed</h2>
               
               <!-- Progress Bar -->
-              <div class="w-full bg-slate-700/60 rounded-full h-3.5 p-0.5 border border-slate-600 shadow-inner">
-                <div class="bg-gradient-to-r from-emerald-500 to-teal-300 h-2.5 rounded-full transition-all duration-500 shadow-md" :style="{ width: currentWeekPercentage + '%' }"></div>
+              <div class="w-full bg-slate-200 dark:bg-slate-700/60 rounded-full h-2 p-0.5 border border-slate-300 dark:border-slate-600 shadow-inner">
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-1 rounded-full transition-all duration-500 shadow-sm" :style="{ width: currentWeekPercentage + '%' }"></div>
               </div>
             </div>
 
-            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-300 pt-3 border-t border-slate-800">
-              <div class="flex flex-wrap gap-2">
-                <span class="bg-slate-800/90 px-3 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
-                  <strong class="text-amber-300">{{ currentWeekPendingCount }}</strong> Due this Sunday
-                </span>
-                <span class="bg-slate-800/90 px-3 py-1 rounded-lg border border-slate-700/80 flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-                  <strong class="text-emerald-300">{{ currentWeekCompletedCount }}</strong> Finished
-                </span>
-              </div>
-              <span class="text-[11px] text-slate-400 font-medium italic">All weekly tasks due each Sunday</span>
+            <div class="flex items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-300 pt-2 border-t border-emerald-200/80 dark:border-slate-800">
+              <span class="bg-white dark:bg-slate-800/90 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700/80 flex items-center gap-1 shadow-sm font-medium">
+                <span class="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
+                <strong class="text-amber-700 dark:text-amber-300">{{ currentWeekPendingCount }}</strong> Due Sunday
+              </span>
+              <span class="bg-white dark:bg-slate-800/90 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700/80 flex items-center gap-1 shadow-sm font-medium">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                <strong class="text-emerald-700 dark:text-emerald-300">{{ currentWeekCompletedCount }}</strong> Finished
+              </span>
             </div>
           </div>
 
-          <!-- Quick Class breakdown -->
-          <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-2.5">
+          <!-- Quick Class breakdown with Quick Launch Links (3 Course Cards side-by-side) -->
+          <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <div v-for="course in courses" :key="course.id" 
                  @click="selectedCourse = selectedCourse === course.code ? 'ALL' : course.code"
                  :class="[
-                   'p-2.5 rounded-xl border cursor-pointer transition flex flex-col justify-between',
-                   selectedCourse === course.code ? 'bg-slate-700/80 border-amber-400 shadow-md' : 'bg-slate-900/50 border-slate-700 hover:border-slate-500'
+                   'p-3.5 rounded-xl border transition-all duration-200 flex flex-col justify-between cursor-pointer group shadow-sm hover:shadow relative overflow-hidden',
+                   selectedCourse === course.code 
+                     ? 'bg-amber-50/90 dark:bg-slate-800 border-amber-500 dark:border-amber-400 ring-2 ring-amber-500/30 dark:ring-amber-400/50 shadow-md' 
+                     : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-700/80 hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-100/80 dark:hover:bg-slate-900/90'
                  ]">
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-xs font-bold px-2 py-0.5 rounded text-white" :style="{ backgroundColor: course.color }">{{ course.code }}</span>
-                <span class="text-xs text-slate-400 font-mono">{{ getCourseProgress(course.code) }}%</span>
+              <!-- Top accent color line -->
+              <div class="absolute top-0 left-0 right-0 h-1" :style="{ backgroundColor: course.color }"></div>
+
+              <!-- Header Row: Badge + % Progress (+1pt font size) -->
+              <div>
+                <div class="flex items-center justify-between gap-1.5 mb-1.5">
+                  <span class="text-xs font-bold px-2.5 py-0.5 rounded text-white shadow-sm flex-shrink-0" :style="{ backgroundColor: course.color }">
+                    {{ course.code }}
+                  </span>
+                  <span class="text-xs font-bold font-mono text-slate-700 dark:text-slate-300 flex-shrink-0 bg-white dark:bg-slate-800/90 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700/60 shadow-sm">
+                    {{ getCourseProgress(course.code) }}%
+                  </span>
+                </div>
+
+                <!-- Course Title Line (+1pt bold font size) -->
+                <div class="text-[13.5px] sm:text-sm font-bold text-slate-900 dark:text-slate-100 group-hover:text-amber-600 dark:group-hover:text-amber-300 transition-colors mb-2 line-clamp-1 leading-snug" :title="course.name">
+                  {{ course.name }}
+                </div>
+
+                <!-- Mini Progress Bar -->
+                <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-1.5 mb-2.5 overflow-hidden border border-slate-300 dark:border-slate-700/40">
+                  <div class="h-1.5 rounded-full transition-all duration-500" :style="{ width: getCourseProgress(course.code) + '%', backgroundColor: course.color }"></div>
+                </div>
               </div>
-              <p class="text-xs font-medium text-slate-200 line-clamp-1 mb-1.5">{{ course.name }}</p>
-              <div class="w-full bg-slate-800 rounded-full h-1.5">
-                <div class="h-1.5 rounded-full" :style="{ width: getCourseProgress(course.code) + '%', backgroundColor: course.color }"></div>
+
+              <!-- Top-level Quick Launch Links (+1pt font size and comfortable button targets) -->
+              <div class="flex items-center justify-between gap-1.5 pt-2 border-t border-slate-200 dark:border-slate-800/90" @click.stop>
+                <!-- Google Drive Folder -->
+                <a v-if="course.driveUrl" :href="course.driveUrl" target="_blank" rel="noopener noreferrer" 
+                   class="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800/90 hover:bg-amber-100 text-slate-700 dark:text-slate-200 hover:text-amber-800 dark:hover:text-amber-300 border border-slate-200 dark:border-slate-700/80 hover:border-amber-400 dark:hover:border-amber-500/50 transition-all shadow-sm group/btn"
+                   title="Google Drive Folder">
+                  <i class="fa-brands fa-google-drive text-amber-500 dark:text-amber-400 text-xs sm:text-sm"></i>
+                  <span>Drive</span>
+                </a>
+
+                <!-- Class Doc -->
+                <a v-if="course.docUrl" :href="course.docUrl" target="_blank" rel="noopener noreferrer" 
+                   class="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800/90 hover:bg-blue-100 text-slate-700 dark:text-slate-200 hover:text-blue-800 dark:hover:text-blue-300 border border-slate-200 dark:border-slate-700/80 hover:border-blue-400 dark:hover:border-blue-500/50 transition-all shadow-sm group/btn"
+                   title="Class Doc">
+                  <i class="fa-solid fa-file-lines text-blue-500 dark:text-blue-400 text-xs sm:text-sm"></i>
+                  <span>Doc</span>
+                </a>
+
+                <!-- Canvas Grades -->
+                <a v-if="course.gradesUrl" :href="course.gradesUrl" target="_blank" rel="noopener noreferrer" 
+                   class="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-lg text-xs font-bold bg-white dark:bg-slate-800/90 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 hover:text-emerald-800 dark:hover:text-emerald-300 border border-slate-200 dark:border-slate-700/80 hover:border-emerald-400 dark:hover:border-emerald-500/50 transition-all shadow-sm group/btn"
+                   title="Canvas Grades">
+                  <i class="fa-solid fa-graduation-cap text-emerald-600 dark:text-emerald-400 text-xs sm:text-sm"></i>
+                  <span>Grades</span>
+                </a>
               </div>
             </div>
           </div>
@@ -152,65 +235,69 @@
       <div class="space-y-4">
         
         <!-- Week Selector Tabs -->
-        <div class="flex items-center justify-between border-b border-slate-800 pb-2 overflow-x-auto custom-scrollbar">
-          <div class="flex space-x-1 sm:space-x-2 min-w-max pb-1">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5 overflow-x-auto custom-scrollbar">
+          <div class="flex space-x-1.5 sm:space-x-2.5 min-w-max pb-1">
             <button @click="selectedWeek = 'ALL'" 
                     :class="[
-                      'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition flex items-center gap-1.5',
-                      selectedWeek === 'ALL' ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 cursor-pointer shadow-sm',
+                      selectedWeek === 'ALL' 
+                        ? 'bg-amber-500 text-slate-950 shadow-md' 
+                        : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-transparent'
                     ]">
               <i class="fa-solid fa-calendar-days"></i> All Weeks
             </button>
             <button v-for="w in 8" :key="w" @click="selectedWeek = w"
                     :class="[
-                      'px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold transition relative',
-                      selectedWeek === w ? 'bg-amber-500 text-slate-950 shadow-md' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition relative cursor-pointer shadow-sm',
+                      selectedWeek === w 
+                        ? 'bg-amber-500 text-slate-950 shadow-md' 
+                        : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-transparent'
                     ]">
               <span>Week {{ w }}</span>
-              <span v-if="getWeekPendingBadge(w) > 0" class="ml-1.5 bg-red-500/20 text-red-300 border border-red-500/40 text-[10px] font-bold px-1.5 py-0.2 rounded-full">
+              <span v-if="getWeekPendingBadge(w) > 0" class="ml-1.5 bg-red-100 text-red-700 border border-red-300 dark:bg-red-500/20 dark:text-red-300 dark:border-red-500/40 text-xs font-black px-2 py-0.5 rounded-full">
                 {{ getWeekPendingBadge(w) }}
               </span>
             </button>
           </div>
 
-          <button @click="resetToSnapshot" class="text-xs text-slate-400 hover:text-amber-400 transition flex items-center gap-1 ml-4 whitespace-nowrap">
+          <button @click="resetToSnapshot" class="text-xs sm:text-sm font-medium text-slate-500 hover:text-amber-600 dark:text-slate-400 dark:hover:text-amber-400 transition flex items-center gap-1.5 ml-4 whitespace-nowrap cursor-pointer">
             <i class="fa-solid fa-rotate-right"></i> Reset Data
           </button>
         </div>
 
-        <!-- Filters Bar -->
-        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
-          <div class="flex flex-wrap items-center gap-2 text-xs">
-            <span class="text-slate-400 font-medium">Filters:</span>
+        <!-- Filters Bar (Increased font sizes and padding) -->
+        <div class="flex flex-wrap items-center justify-between gap-3.5 bg-white dark:bg-slate-800/60 p-4 rounded-2xl border border-slate-200 dark:border-slate-700/60 shadow-sm transition-colors">
+          <div class="flex flex-wrap items-center gap-2.5 text-xs sm:text-sm">
+            <span class="text-slate-600 dark:text-slate-400 font-semibold">Filters:</span>
 
             <!-- Quick Pending Actions Filter Button -->
             <button @click="selectedStatus = selectedStatus === 'PENDING' ? 'ALL' : 'PENDING'"
                     :class="[
-                      'px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 border shadow-sm cursor-pointer',
+                      'px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-2 border shadow-sm cursor-pointer',
                       selectedStatus === 'PENDING'
                         ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-amber-500/20'
-                        : 'bg-amber-500/10 text-amber-300 border-amber-500/40 hover:bg-amber-500/20'
+                        : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/40 dark:hover:bg-amber-500/20'
                     ]">
-              <i class="fa-solid fa-bolt text-amber-400"></i>
+              <i class="fa-solid fa-bolt text-amber-500 dark:text-amber-400"></i>
               <span>Pending Actions</span>
-              <span v-if="selectedStatus === 'PENDING'" class="bg-slate-950/40 text-amber-200 text-[10px] px-1.5 py-0.2 rounded-full font-black">ON</span>
+              <span v-if="selectedStatus === 'PENDING'" class="bg-slate-950/40 text-amber-200 text-xs px-2 py-0.5 rounded-full font-black">ON</span>
             </button>
             
             <!-- Course Filter Dropdown -->
-            <select v-model="selectedCourse" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
-              <option value="ALL">All Classes (3)</option>
-              <option v-for="c in courses" :key="c.code" :value="c.code">{{ c.code }} - {{ c.name }}</option>
+            <select v-model="selectedCourse" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-900 transition-colors">
+              <option value="ALL">All Classes ({{ courses.length }})</option>
+              <option v-for="c in courses" :key="c.code" :value="c.code">{{ c.name }}</option>
             </select>
 
             <!-- Status Filter -->
-            <select v-model="selectedStatus" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+            <select v-model="selectedStatus" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-900 transition-colors">
               <option value="ALL">All Statuses</option>
               <option value="PENDING">Pending Action</option>
               <option value="COMPLETED">Completed Only</option>
             </select>
 
             <!-- Type Filter -->
-            <select v-model="selectedType" class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-amber-500">
+            <select v-model="selectedType" class="bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-900 transition-colors">
               <option value="ALL">All Types</option>
               <option value="Discussion">Discussions Only</option>
               <option value="Assignment">Assignments/Papers</option>
@@ -218,121 +305,123 @@
           </div>
 
           <!-- Search Box -->
-          <div class="relative w-full sm:w-48">
-            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
-            <input v-model="searchQuery" type="text" placeholder="Search tasks..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500">
+          <div class="relative w-full sm:w-56">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-xs sm:text-sm text-slate-400"></i>
+            <input v-model="searchQuery" type="text" placeholder="Search tasks..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-3.5 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:bg-white dark:focus:bg-slate-900 transition-colors">
           </div>
         </div>
 
       </div>
 
       <!-- STREAMING_CHUNK:Rendering assignment list and stage checkboxes... -->
-      <div v-if="filteredAssignments.length === 0" class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-12 text-center space-y-3">
-        <div class="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center mx-auto text-slate-400">
-          <i class="fa-solid fa-list-check text-xl"></i>
+      <div v-if="filteredAssignments.length === 0" class="bg-white dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700/60 rounded-2xl p-12 text-center space-y-3 shadow-sm transition-colors">
+        <div class="w-14 h-14 bg-slate-100 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto text-slate-400">
+          <i class="fa-solid fa-list-check text-2xl"></i>
         </div>
-        <h3 class="text-base font-semibold text-slate-200">No assignments match your filters</h3>
-        <p class="text-xs text-slate-400">Try changing the week filter or clearing search criteria.</p>
-        <button @click="clearFilters" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-xs font-semibold rounded-lg transition">Reset Filters</button>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">No assignments match your filters</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400">Try changing the week filter or clearing search criteria.</p>
+        <button @click="clearFilters" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-200 text-sm font-bold rounded-xl transition cursor-pointer shadow-sm">Reset Filters</button>
       </div>
 
       <div v-else class="space-y-4">
         
         <div v-for="item in filteredAssignments" :key="item.id" 
              :class="[
-               'bg-slate-800 border rounded-2xl p-4 sm:p-5 transition shadow-lg relative overflow-hidden',
-               isFullyComplete(item) ? 'border-emerald-500/40 bg-slate-800/50 opacity-80' : 'border-slate-700 hover:border-slate-600'
+               'rounded-2xl p-5 sm:p-6 transition-all shadow-sm hover:shadow-md relative overflow-hidden border',
+               isFullyComplete(item) 
+                 ? 'border-emerald-300/80 bg-emerald-50/40 dark:border-emerald-500/40 dark:bg-slate-800/50 opacity-90 dark:opacity-80' 
+                 : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600'
              ]">
           
           <!-- Colored Accent Bar based on Class -->
-          <div class="absolute left-0 top-0 bottom-0 w-1.5" :style="{ backgroundColor: getCourseColor(item.courseCode) }"></div>
+          <div class="absolute left-0 top-0 bottom-0 w-2" :style="{ backgroundColor: getCourseColor(item.courseCode) }"></div>
 
-          <div class="pl-2 flex flex-col md:flex-row md:items-start justify-between gap-4">
+          <div class="pl-2.5 flex flex-col lg:flex-row lg:items-start justify-between gap-5">
             
             <!-- Left Info Block -->
-            <div class="space-y-2 flex-grow">
+            <div class="space-y-2.5 flex-grow">
               
               <!-- Badges Header -->
-              <div class="flex flex-wrap items-center gap-2 text-xs">
+              <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                 <!-- Course Tag -->
-                <span class="px-2 py-0.5 rounded font-bold text-white shadow-sm" :style="{ backgroundColor: getCourseColor(item.courseCode) }">
+                <span class="px-2.5 py-0.5 rounded-md font-bold text-white shadow-sm" :style="{ backgroundColor: getCourseColor(item.courseCode) }">
                   {{ item.courseCode }}
                 </span>
 
                 <!-- Week Tag -->
-                <span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded font-semibold">
+                <span class="bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:border-transparent px-2.5 py-0.5 rounded-md font-semibold">
                   Week {{ item.week }}
                 </span>
 
                 <!-- Type Tag -->
-                <span v-if="item.type === 'Discussion'" class="bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded font-medium flex items-center gap-1">
-                  <i class="fa-solid fa-comments text-[10px]"></i> Multi-Stage Discussion
+                <span v-if="item.type === 'Discussion'" class="bg-purple-100 text-purple-800 border border-purple-200 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30 px-2.5 py-0.5 rounded-md font-semibold flex items-center gap-1.5">
+                  <i class="fa-solid fa-comments text-xs"></i> Multi-Stage Discussion
                 </span>
-                <span v-else class="bg-blue-500/20 text-blue-300 border border-blue-500/30 px-2 py-0.5 rounded font-medium flex items-center gap-1">
-                  <i class="fa-solid fa-file-lines text-[10px]"></i> Deliverable Paper/Project
+                <span v-else class="bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:border-blue-500/30 px-2.5 py-0.5 rounded-md font-semibold flex items-center gap-1.5">
+                  <i class="fa-solid fa-file-lines text-xs"></i> Deliverable Paper/Project
                 </span>
 
                 <!-- Completion Badge -->
-                <span v-if="isFullyComplete(item)" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
-                  <i class="fa-solid fa-check text-[10px]"></i> Completed
+                <span v-if="isFullyComplete(item)" class="bg-emerald-100 text-emerald-800 border border-emerald-300 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border-emerald-500/30 px-2.5 py-0.5 rounded-md font-bold flex items-center gap-1.5">
+                  <i class="fa-solid fa-check text-xs"></i> Completed
                 </span>
-                <span v-else-if="isPartiallyComplete(item)" class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-semibold flex items-center gap-1">
-                  <i class="fa-solid fa-spinner text-[10px] animate-spin"></i> In Progress
+                <span v-else-if="isPartiallyComplete(item)" class="bg-amber-100 text-amber-800 border border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/30 px-2.5 py-0.5 rounded-md font-bold flex items-center gap-1.5">
+                  <i class="fa-solid fa-spinner text-xs animate-spin"></i> In Progress ({{ getDiscussionCompletedCount(item) }}/3)
+                </span>
+                <span v-else class="bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-700/60 dark:text-slate-400 dark:border-transparent px-2.5 py-0.5 rounded-md font-semibold">
+                  Not Started
                 </span>
               </div>
 
-              <!-- Title with active Canvas hyperlink & Learning Resources Button -->
-              <div class="flex items-center gap-2 flex-wrap">
-                <a v-if="item.canvasUrl" :href="item.canvasUrl" target="_blank" rel="noopener noreferrer" 
-                   :class="['text-base sm:text-lg font-bold transition hover:underline inline-flex items-center gap-2', isFullyComplete(item) ? 'line-through text-slate-400' : 'text-amber-300 hover:text-amber-200']">
-                  <span>{{ item.title }}</span>
-                  <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-80"></i>
-                </a>
-                <h3 v-else :class="['text-base sm:text-lg font-bold transition', isFullyComplete(item) ? 'line-through text-slate-400' : 'text-white']">
-                  {{ item.title }}
-                </h3>
+              <!-- Title (Larger font for effortless scanning) -->
+              <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white leading-snug pt-0.5">
+                {{ item.title }}
+              </h3>
 
-                <!-- Learning Resources Link Button -->
-                <a v-if="item.resourcesUrl" :href="item.resourcesUrl" target="_blank" rel="noopener noreferrer" 
-                   class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold bg-indigo-950/60 hover:bg-indigo-900 text-indigo-300 rounded-lg border border-indigo-700/60 transition shadow-sm hover:border-indigo-500 hover:text-indigo-200">
-                  <i class="fa-solid fa-book-open text-indigo-400 text-[11px]"></i>
-                  <span>Learning Resources</span>
-                  <i class="fa-solid fa-arrow-up-right-from-square text-[9px] text-indigo-400/80"></i>
+              <!-- Direct Canvas & Resource Links -->
+              <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                <a :href="item.canvasUrl" target="_blank" rel="noopener noreferrer" 
+                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 dark:bg-red-950/40 dark:hover:bg-red-900/60 dark:text-red-300 dark:border-red-800/50 transition shadow-sm">
+                  <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                  <span>Open Assignment in Canvas</span>
+                </a>
+
+                <a v-if="item.resourcesUrl" :href="item.resourcesUrl" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 dark:text-emerald-300 dark:border-emerald-800/50 transition shadow-sm">
+                  <i class="fa-solid fa-book-open text-xs"></i>
+                  <span>Week Resources</span>
                 </a>
               </div>
 
-              
-
-              <!-- Description / Notes -->
-              <p v-if="item.notes" class="text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-lg border border-slate-700/50 leading-relaxed">
-                <i class="fa-solid fa-circle-info text-amber-400 mr-1.5"></i>{{ item.notes }}
-              </p>
+              <!-- Instructor Notes -->
+              <div v-if="item.notes" class="bg-slate-50 dark:bg-slate-900/70 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/50 text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-2">
+                <span class="font-bold text-amber-700 dark:text-amber-400 block mb-1"><i class="fa-regular fa-note-sticky mr-1.5"></i>Instructor Due Date Rule:</span>
+                {{ item.notes }}
+              </div>
 
             </div>
 
-            <!-- Right Interactive Task Checkers Block -->
-            <div class="bg-slate-900/70 p-3 sm:p-4 rounded-xl border border-slate-700/80 min-w-full md:min-w-[320px] space-y-3">
+            <!-- Right Action Block: Stages or Complete button -->
+            <div class="w-full lg:w-96 flex-shrink-0">
               
-              <!-- Multi-Stage Discussion Checks (Thursday & Sunday) -->
+              <!-- Multi-stage Checklist for Discussions -->
               <div v-if="item.type === 'Discussion'" class="space-y-2.5">
-                <div class="flex items-center justify-between pb-1 border-b border-slate-800 text-xs font-semibold text-slate-400">
-                  <span>DISCUSSION STAGES</span>
-                  <span class="text-amber-400">{{ getDiscussionCompletedCount(item) }}/3 Done</span>
-                </div>
-
+                
                 <!-- Stage 1: Initial Post (Thursday) -->
                 <label @click.prevent="toggleDiscussionStage(item, 'initial')" 
                        :class="[
-                         'flex items-center justify-between p-2 rounded-lg cursor-pointer transition border text-xs',
-                         item.stages.initial.completed ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-200'
+                         'flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition border text-xs sm:text-sm shadow-sm',
+                         item.stages.initial.completed 
+                           ? 'bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-500/40 dark:text-emerald-300' 
+                           : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-800 dark:bg-slate-800/80 dark:border-slate-700 dark:hover:border-slate-600 dark:text-slate-200'
                        ]">
-                  <div class="flex items-center space-x-2.5">
-                    <div :class="['w-4 h-4 rounded flex items-center justify-center border transition', item.stages.initial.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'border-slate-500 bg-slate-900']">
-                      <i v-if="item.stages.initial.completed" class="fa-solid fa-check text-[10px] font-black"></i>
+                  <div class="flex items-center space-x-3">
+                    <div :class="['w-5 h-5 rounded-md flex items-center justify-center border transition', item.stages.initial.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'border-slate-400 bg-white dark:border-slate-500 dark:bg-slate-900']">
+                      <i v-if="item.stages.initial.completed" class="fa-solid fa-check text-xs font-black"></i>
                     </div>
-                    <span class="font-medium">Initial Discussion Post</span>
+                    <span class="font-semibold">Initial Discussion Post</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                  <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/30 font-semibold">
                     <i class="fa-regular fa-calendar mr-1"></i>Thu {{ formatDate(item.dueDateInitial) }}
                   </span>
                 </label>
@@ -340,16 +429,18 @@
                 <!-- Stage 2: Peer Reply 1 (Sunday) -->
                 <label @click.prevent="toggleDiscussionStage(item, 'reply1')" 
                        :class="[
-                         'flex items-center justify-between p-2 rounded-lg cursor-pointer transition border text-xs',
-                         item.stages.reply1.completed ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-200'
+                         'flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition border text-xs sm:text-sm shadow-sm',
+                         item.stages.reply1.completed 
+                           ? 'bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-500/40 dark:text-emerald-300' 
+                           : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-800 dark:bg-slate-800/80 dark:border-slate-700 dark:hover:border-slate-600 dark:text-slate-200'
                        ]">
-                  <div class="flex items-center space-x-2.5">
-                    <div :class="['w-4 h-4 rounded flex items-center justify-center border transition', item.stages.reply1.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'border-slate-500 bg-slate-900']">
-                      <i v-if="item.stages.reply1.completed" class="fa-solid fa-check text-[10px] font-black"></i>
+                  <div class="flex items-center space-x-3">
+                    <div :class="['w-5 h-5 rounded-md flex items-center justify-center border transition', item.stages.reply1.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'border-slate-400 bg-white dark:border-slate-500 dark:bg-slate-900']">
+                      <i v-if="item.stages.reply1.completed" class="fa-solid fa-check text-xs font-black"></i>
                     </div>
-                    <span class="font-medium">Peer Discussion Reply #1</span>
+                    <span class="font-semibold">Peer Discussion Reply #1</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                  <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/30 font-semibold">
                     <i class="fa-regular fa-calendar mr-1"></i>Sun {{ formatDate(item.dueDateFinal) }}
                   </span>
                 </label>
@@ -357,16 +448,18 @@
                 <!-- Stage 3: Peer Reply 2 (Sunday) -->
                 <label @click.prevent="toggleDiscussionStage(item, 'reply2')" 
                        :class="[
-                         'flex items-center justify-between p-2 rounded-lg cursor-pointer transition border text-xs',
-                         item.stages.reply2.completed ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-slate-800/80 border-slate-700 hover:border-slate-600 text-slate-200'
+                         'flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition border text-xs sm:text-sm shadow-sm',
+                         item.stages.reply2.completed 
+                           ? 'bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-500/40 dark:text-emerald-300' 
+                           : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-800 dark:bg-slate-800/80 dark:border-slate-700 dark:hover:border-slate-600 dark:text-slate-200'
                        ]">
-                  <div class="flex items-center space-x-2.5">
-                    <div :class="['w-4 h-4 rounded flex items-center justify-center border transition', item.stages.reply2.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'border-slate-500 bg-slate-900']">
-                      <i v-if="item.stages.reply2.completed" class="fa-solid fa-check text-[10px] font-black"></i>
+                  <div class="flex items-center space-x-3">
+                    <div :class="['w-5 h-5 rounded-md flex items-center justify-center border transition', item.stages.reply2.completed ? 'bg-emerald-500 border-emerald-500 text-slate-950' : 'border-slate-400 bg-white dark:border-slate-500 dark:bg-slate-900']">
+                      <i v-if="item.stages.reply2.completed" class="fa-solid fa-check text-xs font-black"></i>
                     </div>
-                    <span class="font-medium">Peer Discussion Reply #2</span>
+                    <span class="font-semibold">Peer Discussion Reply #2</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                  <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-300 dark:border-blue-500/30 font-semibold">
                     <i class="fa-regular fa-calendar mr-1"></i>Sun {{ formatDate(item.dueDateFinal) }}
                   </span>
                 </label>
@@ -374,17 +467,17 @@
 
               <!-- Standard Single Stage Completion for Regular Assignments -->
               <div v-else class="space-y-3">
-                <div class="flex items-center justify-between text-xs font-semibold text-slate-400 pb-1 border-b border-slate-800">
+                <div class="flex items-center justify-between text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 pb-1.5 border-b border-slate-200 dark:border-slate-800">
                   <span>DUE DATE</span>
-                  <span class="text-blue-400 font-mono"><i class="fa-regular fa-calendar mr-1"></i>Sun {{ formatDate(item.dueDateFinal) }}</span>
+                  <span class="text-blue-600 dark:text-blue-400 font-mono font-bold"><i class="fa-regular fa-calendar mr-1"></i>Sun {{ formatDate(item.dueDateFinal) }}</span>
                 </div>
 
                 <button @click="toggleStandardAssignment(item)" 
                         :class="[
-                          'w-full py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 shadow',
+                          'w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 shadow cursor-pointer',
                           item.status === 'completed' 
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
-                            : 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20' 
+                            : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-amber-500/20'
                         ]">
                   <i :class="['fa-solid', item.status === 'completed' ? 'fa-circle-check' : 'fa-circle']"></i>
                   <span>{{ item.status === 'completed' ? 'Assignment Completed' : 'Mark as Completed' }}</span>
@@ -403,65 +496,65 @@
 
     <!-- STREAMING_CHUNK:Adding web sync guide modal... -->
     <!-- Web Sync / Hosting / Mobile Instructions Modal -->
-    <div v-if="showWebGuide" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6 space-y-6 shadow-2xl relative">
+    <div v-if="showWebGuide" class="fixed inset-0 z-50 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar p-6 space-y-6 shadow-2xl relative text-slate-800 dark:text-slate-200 transition-colors">
         
-        <button @click="showWebGuide = false" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+        <button @click="showWebGuide = false" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 dark:hover:text-white text-xl cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
 
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl">
             <i class="fa-solid fa-globe"></i>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">How to Run on Web & Mobile Phone</h3>
-            <p class="text-xs text-slate-400">Access your DBA schedule from anywhere across all devices</p>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">How to Run on Web & Mobile Phone</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Access your DBA schedule from anywhere across all devices</p>
           </div>
         </div>
 
-        <div class="space-y-4 text-xs sm:text-sm text-slate-300 leading-relaxed">
+        <div class="space-y-4 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
           
-          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/70 space-y-2">
-            <h4 class="font-bold text-amber-400 text-sm flex items-center gap-2">
+          <div class="bg-slate-50 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700/70 space-y-2">
+            <h4 class="font-bold text-amber-600 dark:text-amber-400 text-sm flex items-center gap-2">
               <i class="fa-brands fa-github text-base"></i> Option 1: GitHub Pages (Free Hosting)
             </h4>
-            <ol class="list-decimal list-inside space-y-1.5 text-slate-300">
-              <li>Create a free account on <strong class="text-white">GitHub.com</strong>.</li>
-              <li>Create a new repository (e.g., <code class="bg-slate-800 px-1 py-0.5 rounded text-amber-300">dba-tracker</code>).</li>
-              <li>Upload this <code class="bg-slate-800 px-1 py-0.5 rounded text-amber-300">index.html</code> file.</li>
-              <li>Go to <strong class="text-white">Settings &rarr; Pages</strong>, set branch to <code class="bg-slate-800 px-1 py-0.5 rounded text-amber-300">main</code>, and click Save.</li>
-              <li>Your site will be live at <code class="text-emerald-400">https://yourusername.github.io/dba-tracker</code>!</li>
+            <ol class="list-decimal list-inside space-y-1.5">
+              <li>Create a free account on <strong class="text-slate-900 dark:text-white">GitHub.com</strong>.</li>
+              <li>Create a new repository (e.g., <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-amber-700 dark:text-amber-300">dba-tracker</code>).</li>
+              <li>Upload this <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-amber-700 dark:text-amber-300">index.html</code> file.</li>
+              <li>Go to <strong class="text-slate-900 dark:text-white">Settings &rarr; Pages</strong>, set branch to <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-amber-700 dark:text-amber-300">main</code>, and click Save.</li>
+              <li>Your site will be live at <code class="text-emerald-600 dark:text-emerald-400 font-mono">https://yourusername.github.io/dba-tracker</code>!</li>
             </ol>
           </div>
 
-          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/70 space-y-2">
-            <h4 class="font-bold text-blue-400 text-sm flex items-center gap-2">
+          <div class="bg-slate-50 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700/70 space-y-2">
+            <h4 class="font-bold text-blue-600 dark:text-blue-400 text-sm flex items-center gap-2">
               <i class="fa-solid fa-bolt text-base"></i> Option 2: Vercel or Netlify (30-second Drag-and-Drop)
             </h4>
-            <ol class="list-decimal list-inside space-y-1.5 text-slate-300">
-              <li>Go to <strong class="text-white">Vercel.com</strong> or <strong class="text-white">Netlify.com</strong>.</li>
-              <li>Drag and drop the folder containing this <code class="bg-slate-800 px-1 py-0.5 rounded text-amber-300">index.html</code> file onto their dashboard.</li>
+            <ol class="list-decimal list-inside space-y-1.5">
+              <li>Go to <strong class="text-slate-900 dark:text-white">Vercel.com</strong> or <strong class="text-slate-900 dark:text-white">Netlify.com</strong>.</li>
+              <li>Drag and drop the folder containing this <code class="bg-slate-200 dark:bg-slate-800 px-1 py-0.5 rounded text-amber-700 dark:text-amber-300">index.html</code> file onto their dashboard.</li>
               <li>They will automatically deploy it and give you a live HTTPS link instantly.</li>
             </ol>
           </div>
 
-          <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/70 space-y-2">
-            <h4 class="font-bold text-emerald-400 text-sm flex items-center gap-2">
+          <div class="bg-slate-50 dark:bg-slate-900/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700/70 space-y-2">
+            <h4 class="font-bold text-emerald-600 dark:text-emerald-400 text-sm flex items-center gap-2">
               <i class="fa-solid fa-mobile-screen text-base"></i> Mobile App Shortcut (iOS / Android)
             </h4>
-            <p class="text-slate-300">Once hosted online (or opened on mobile Safari/Chrome):</p>
-            <ul class="list-disc list-inside space-y-1 text-slate-300">
-              <li><strong class="text-white">iPhone (Safari):</strong> Tap the <i class="fa-solid fa-share-nodes text-xs text-blue-400"></i> Share button &rarr; Select <strong>"Add to Home Screen"</strong>.</li>
-              <li><strong class="text-white">Android (Chrome):</strong> Tap the 3 dots menu &rarr; Select <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong>.</li>
+            <p>Once hosted online (or opened on mobile Safari/Chrome):</p>
+            <ul class="list-disc list-inside space-y-1">
+              <li><strong class="text-slate-900 dark:text-white">iPhone (Safari):</strong> Tap the <i class="fa-solid fa-share-nodes text-xs text-blue-500"></i> Share button &rarr; Select <strong>"Add to Home Screen"</strong>.</li>
+              <li><strong class="text-slate-900 dark:text-white">Android (Chrome):</strong> Tap the 3 dots menu &rarr; Select <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong>.</li>
             </ul>
-            <p class="text-xs text-slate-400 italic pt-1">It will launch like a native full-screen app on your phone with all your localStorage data intact!</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 italic pt-1">It will launch like a native full-screen app on your phone with all your localStorage data intact!</p>
           </div>
 
         </div>
 
         <div class="flex justify-end pt-2">
-          <button @click="showWebGuide = false" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition">
+          <button @click="showWebGuide = false" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition cursor-pointer shadow">
             Got it, thanks!
           </button>
         </div>
@@ -469,57 +562,103 @@
       </div>
     </div>
 
-    <!-- Supabase Cloud Setup & Sync Modal -->
-    <div v-if="showCloudModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
+        <!-- Floating Cloud Connection Alert Toast -->
+    <transition enter-active-class="transition ease-out duration-300 transform" 
+                enter-from-class="translate-y-8 opacity-0" 
+                enter-to-class="translate-y-0 opacity-100" 
+                leave-active-class="transition ease-in duration-200 transform" 
+                leave-from-class="translate-y-0 opacity-100" 
+                leave-to-class="translate-y-8 opacity-0">
+      <div v-if="showCloudAlertToast" 
+           class="fixed bottom-6 right-6 z-50 max-w-md w-full bg-slate-900/95 dark:bg-slate-800/95 backdrop-blur-md text-white p-4 sm:p-5 rounded-2xl border border-amber-500/60 shadow-2xl shadow-amber-500/20 flex flex-col gap-3">
         
-        <button @click="showCloudModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between gap-2">
+              <h4 class="text-sm font-bold text-amber-300 flex items-center gap-1.5">
+                <span>Progress Saved Locally</span>
+                <span class="bg-amber-500/20 text-amber-400 text-[10px] px-1.5 py-0.2 rounded font-mono font-bold">Offline</span>
+              </h4>
+              <button @click="showCloudAlertToast = false" class="text-slate-400 hover:text-white text-xs cursor-pointer p-1">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+            <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+              Your changes are <strong>safe on this Mac</strong>. To sync across your iPhone and other devices in real-time, connect to your Cloud database.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-700/80">
+          <button @click="showCloudAlertToast = false" 
+                  class="px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white rounded-lg hover:bg-slate-800 transition cursor-pointer">
+            Continue Locally
+          </button>
+          <button @click="showCloudAlertToast = false; showCloudModal = true" 
+                  class="px-3.5 py-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl transition shadow-md shadow-amber-500/20 cursor-pointer flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt text-xs"></i>
+            <span>Connect Cloud Now</span>
+          </button>
+        </div>
+
+      </div>
+    </transition>
+
+    <!-- Supabase Cloud Setup & Sync Modal -->
+    <div v-if="showCloudModal" class="fixed inset-0 z-50 bg-slate-950/60 dark:bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative text-slate-800 dark:text-slate-200 transition-colors">
+        
+        <button @click="showCloudModal = false" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 dark:hover:text-white text-xl cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
         </button>
 
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl">
             <i class="fa-solid fa-cloud-bolt"></i>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Supabase Cloud Real-Time Sync</h3>
-            <p class="text-xs text-slate-400">Sync your assignment progress across Mac, iPhone & Web</p>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Supabase Cloud Real-Time Sync</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Sync your assignment progress across Mac, iPhone & Web</p>
           </div>
         </div>
 
-        <div class="space-y-4 text-xs text-slate-300">
+        <div class="space-y-4 text-xs text-slate-600 dark:text-slate-300">
           <div class="space-y-1.5">
-            <label class="block font-semibold text-slate-200">Supabase Project URL</label>
-            <input v-model="supabaseUrl" type="text" placeholder="https://xyz.supabase.co" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-amber-500">
+            <label class="block font-semibold text-slate-700 dark:text-slate-200">Supabase Project URL</label>
+            <input v-model="supabaseUrl" type="text" placeholder="https://xyz.supabase.co" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 font-mono focus:outline-none focus:border-amber-500">
           </div>
 
           <div class="space-y-1.5">
-            <label class="block font-semibold text-slate-200">Supabase Anon API Key</label>
-            <input v-model="supabaseAnonKey" type="password" placeholder="eyJhbGciOiJIUzI1Ni..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono focus:outline-none focus:border-amber-500">
+            <label class="block font-semibold text-slate-700 dark:text-slate-200">Supabase Anon API Key</label>
+            <input v-model="supabaseAnonKey" type="password" placeholder="eyJhbGciOiJIUzI1Ni..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-slate-200 font-mono focus:outline-none focus:border-amber-500">
           </div>
 
-          <div v-if="cloudStatusMsg" :class="['p-2.5 rounded-lg border text-xs font-medium flex items-center gap-2', isCloudConnected ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' : 'bg-red-950/40 border-red-500/40 text-red-300']">
+          <div v-if="cloudStatusMsg" :class="['p-2.5 rounded-lg border text-xs font-medium flex items-center gap-2', isCloudConnected ? 'bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-500/40 dark:text-emerald-300' : 'bg-red-50 border-red-300 text-red-800 dark:bg-red-950/40 dark:border-red-500/40 dark:text-red-300']">
             <i :class="['fa-solid', isCloudConnected ? 'fa-circle-check' : 'fa-triangle-exclamation']"></i>
             <span>{{ cloudStatusMsg }}</span>
           </div>
         </div>
 
-        <div class="flex justify-between items-center pt-2 border-t border-slate-700/60">
-          <button @click="disconnectCloud" class="text-xs text-red-400 hover:text-red-300 underline font-medium">
+        <div class="flex justify-between items-center pt-2 border-t border-slate-200 dark:border-slate-700/60">
+          <button @click="disconnectCloud" class="text-xs text-red-600 dark:text-red-400 hover:underline font-medium cursor-pointer">
             Disconnect Cloud
           </button>
 
           <div class="flex space-x-2">
-            <button @click="showCloudModal = false" class="px-3.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 font-semibold text-xs rounded-xl transition">
+            <button @click="showCloudModal = false" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-slate-300 font-semibold text-xs rounded-xl transition cursor-pointer">
               Close
             </button>
-            <button @click="saveCloudConfig" class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl transition shadow">
+            <button @click="saveCloudConfig" class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl transition shadow cursor-pointer">
               Connect & Sync
             </button>
           </div>
         </div>
 
       </div>
+    </div>
     </div>
 
   </div>
@@ -530,8 +669,31 @@
 
     createApp({
       setup() {
+        const isDarkMode = ref(localStorage.getItem('dba_theme') !== 'light');
+
+        const toggleTheme = () => {
+          isDarkMode.value = !isDarkMode.value;
+          if (isDarkMode.value) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('dba_theme', 'dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('dba_theme', 'light');
+          }
+        };
         const showWebGuide = ref(false);
         const showCloudModal = ref(false);
+        const showCloudAlertToast = ref(false);
+        let cloudAlertTimeout = null;
+
+        const triggerCloudAlert = () => {
+          if (isCloudConnected.value) return;
+          showCloudAlertToast.value = true;
+          if (cloudAlertTimeout) clearTimeout(cloudAlertTimeout);
+          cloudAlertTimeout = setTimeout(() => {
+            showCloudAlertToast.value = false;
+          }, 8000);
+        };
         const supabaseUrl = ref(localStorage.getItem('dba_supabase_url') || 'https://hmxwmzrzvicgjppfqvhl.supabase.co');
         const supabaseAnonKey = ref(localStorage.getItem('dba_supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhteHdtenJ6dmljZ2pwcGZxdmhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODczMjI2MDAsImV4cCI6MjEwMjg5ODYwMH0.TKk-CZgr7aI_tDkTO1Je9N4euOAfCrVbdcADs6LYEAI');
         const isCloudConnected = ref(false);
@@ -547,9 +709,33 @@
         const selectedType = ref('ALL');
 
         const courses = ref([
-          { id: 'dba7015', code: 'DBA 7015', name: 'Dr Staci (Entrepreneurship)', color: '#d97706' },
-          { id: 'dba7012', code: 'DBA 7012', name: 'Multicultural & Global Teams', color: '#0284c7' },
-          { id: 'practicum', code: 'Global Practicum', name: 'Global Practicum', color: '#059669' }
+          {
+            id: 'dba7012',
+            code: 'DBA 7012',
+            name: 'DBA - 7012 - Dr Walker',
+            color: '#0284c7',
+            driveUrl: 'https://drive.google.com/drive/folders/12YWY-7LpC7PA4M82uD9bOdG25LYeY4s9',
+            docUrl: 'https://docs.google.com/document/d/1Hadh1XxuGlw2QwGaDecTJd0wNOKN4XbzUhEe7ltwg1Y/edit?tab=t.0',
+            gradesUrl: 'https://indianatech.instructure.com/courses/29831/grades'
+          },
+          {
+            id: 'dba7015',
+            code: 'DBA 7015',
+            name: 'DBA - 7015 - Dr Staci',
+            color: '#d97706',
+            driveUrl: 'https://drive.google.com/drive/folders/1026aWiaZe8-bu0PV66MN2orvF-7V2ykG',
+            docUrl: 'https://docs.google.com/document/d/17IHHsZzLigf-ubmPoyagIOkLSc4BRB8_WwYk_HJkkTA/edit?tab=t.0',
+            gradesUrl: 'https://indianatech.instructure.com/courses/29832/grades'
+          },
+          {
+            id: 'olhe7008',
+            code: 'OLHE 7008',
+            name: 'OLHE 7008 - TOR Global Pracitcum',
+            color: '#059669',
+            driveUrl: 'https://drive.google.com/drive/folders/1NGILBIN-E7KEZUESZ6B6Fd9AIQqyLRzJ',
+            docUrl: 'https://docs.google.com/document/d/18DBwMxLy-aVJhsKs-2KYVE6YXK4ZOHwIt9Eoh8EoAR8/edit?tab=t.0',
+            gradesUrl: 'https://indianatech.instructure.com/courses/29712/grades'
+          }
         ]);
 
         /* STREAMING_CHUNK:Loading default schedule snapshot and localStorage sync... */
@@ -1283,7 +1469,7 @@
   },
   {
     "id": "practicum-w1-disc",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 1,
     "type": "Discussion",
     "title": "Week 1: Global Leadership Capabilities Assessment Discussion",
@@ -1310,7 +1496,7 @@
   },
   {
     "id": "practicum-w2-disc",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 2,
     "type": "Discussion",
     "title": "Week 2: History & Culture Discussion",
@@ -1337,7 +1523,7 @@
   },
   {
     "id": "practicum-w2-journal",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 2,
     "type": "Assignment",
     "title": "Incident Journal - Pre-Departure Entry 1",
@@ -1351,7 +1537,7 @@
   },
   {
     "id": "practicum-w3-disc",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 3,
     "type": "Discussion",
     "title": "Week 3: Society, Business, & Cultural Leadership Discussion",
@@ -1378,7 +1564,7 @@
   },
   {
     "id": "practicum-w5-journal",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 5,
     "type": "Assignment",
     "title": "Incident Journal - Pre-Departure Entry 2",
@@ -1392,7 +1578,7 @@
   },
   {
     "id": "practicum-w5-disc",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 5,
     "type": "Discussion",
     "title": "Week 4: Travel itinerary and contact information Discussion",
@@ -1419,7 +1605,7 @@
   },
   {
     "id": "practicum-w6-journal",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 6,
     "type": "Assignment",
     "title": "Pre-Departure Journal 3: Disorientation",
@@ -1433,7 +1619,7 @@
   },
   {
     "id": "practicum-w7-journal",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 7,
     "type": "Assignment",
     "title": "Pre-Departure Journal 4: Critical Reflection",
@@ -1447,7 +1633,7 @@
   },
   {
     "id": "practicum-w8-j5",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 8,
     "type": "Assignment",
     "title": "Incident Journal - Discourse and Learning",
@@ -1461,7 +1647,7 @@
   },
   {
     "id": "practicum-w8-j6",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 8,
     "type": "Assignment",
     "title": "Incident Journal - Action and Integration",
@@ -1475,7 +1661,7 @@
   },
   {
     "id": "practicum-w8-project",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 8,
     "type": "Assignment",
     "title": "Final Project - Presentation",
@@ -1489,7 +1675,7 @@
   },
   {
     "id": "practicum-w8-paper",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 8,
     "type": "Assignment",
     "title": "Final Global Practicum Paper: Canada, Culture & Leadership in Practice",
@@ -1503,7 +1689,7 @@
   },
   {
     "id": "practicum-w8-reentry",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 8,
     "type": "Assignment",
     "title": "Incident Journal - Post-Travel (Re-entry) Entry 1",
@@ -1517,7 +1703,7 @@
   },
   {
     "id": "practicum-w8-disc",
-    "courseCode": "Global Practicum",
+    "courseCode": "OLHE 7008",
     "week": 8,
     "type": "Discussion",
     "title": "Week 8: Final Reflection Discussion",
@@ -1605,12 +1791,21 @@
           } else {
             item.status = 'not_started';
           }
-          syncItemToCloud(item);
+
+          if (isCloudConnected.value) {
+            syncItemToCloud(item);
+          } else {
+            triggerCloudAlert();
+          }
         };
 
         const toggleStandardAssignment = (item) => {
           item.status = item.status === 'completed' ? 'not_started' : 'completed';
-          syncItemToCloud(item);
+          if (isCloudConnected.value) {
+            syncItemToCloud(item);
+          } else {
+            triggerCloudAlert();
+          }
         };
 
         const isFullyComplete = (item) => {
@@ -1645,7 +1840,7 @@
             if (selectedWeek.value !== 'ALL' && item.week !== selectedWeek.value) return false;
             
             // Course Filter
-            if (selectedCourse.value !== 'ALL' && item.courseCode !== selectedCourse.value) return false;
+            if (selectedCourse.value !== 'ALL' && item.courseCode !== selectedCourse.value && !(selectedCourse.value === 'OLHE 7008' && item.courseCode === 'Global Practicum')) return false;
 
             // Type Filter
             if (selectedType.value !== 'ALL' && item.type !== selectedType.value) return false;
@@ -1743,12 +1938,12 @@
         });
 
         const getCourseColor = (courseCode) => {
-          const c = courses.value.find(x => x.code === courseCode);
+          const c = courses.value.find(x => x.code === courseCode || (courseCode === 'Global Practicum' && x.code === 'OLHE 7008'));
           return c ? c.color : '#64748b';
         };
 
         const getCourseProgress = (courseCode) => {
-          const courseItems = assignments.value.filter(i => i.courseCode === courseCode);
+          const courseItems = assignments.value.filter(i => i.courseCode === courseCode || (courseCode === 'OLHE 7008' && i.courseCode === 'Global Practicum'));
           if (courseItems.length === 0) return 0;
           const done = courseItems.filter(i => isFullyComplete(i)).length;
           return Math.round((done / courseItems.length) * 100);
@@ -1971,6 +2166,8 @@
           getDiscussionCompletedCount,
           resetToSnapshot,
           clearFilters,
+          isDarkMode,
+          toggleTheme,
           formatDate,
           handleFileUpload,
           parseCustomCSV
