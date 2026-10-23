@@ -428,7 +428,7 @@
 
                   <!-- Week Tag -->
                   <span class="bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:border-transparent px-2.5 py-0.5 rounded-md font-semibold">
-                    Week {{ item.week }}
+                    {{ activeSemester === 'Fall 2 - 2026' && item.fall2Week ? 'Week ' + item.fall2Week + ' (Practicum Wk 8)' : 'Week ' + item.week }}
                   </span>
 
                   <!-- Overlap Badge if applicable -->
@@ -2476,11 +2476,18 @@
         const assignments = ref(JSON.parse(JSON.stringify(defaultAssignmentsSnapshot)));
 
         const loadFromLocalStorage = () => {
-          const stored = localStorage.getItem('indiana_tech_dba_v6') || localStorage.getItem('indiana_tech_dba_fall1_v5');
+          const storedV7 = localStorage.getItem('indiana_tech_dba_v7');
+          const storedOld = localStorage.getItem('indiana_tech_dba_v6') || localStorage.getItem('indiana_tech_dba_fall1_v5');
+          const stored = storedV7 || storedOld;
           if (stored) {
             try {
               const parsed = JSON.parse(stored);
               if (Array.isArray(parsed) && parsed.length > 0) {
+                if (!storedV7) {
+                  // Restore practicum-w8-j6 if it was saved as completed during test run
+                  const j6 = parsed.find(i => i.id === 'practicum-w8-j6');
+                  if (j6) j6.status = 'not_started';
+                }
                 assignments.value = enrichWithStaticSnapshotData(parsed);
               } else {
                 assignments.value = JSON.parse(JSON.stringify(defaultAssignmentsSnapshot));
@@ -2491,11 +2498,16 @@
           } else {
             assignments.value = JSON.parse(JSON.stringify(defaultAssignmentsSnapshot));
           }
+          if (!storedV7) {
+            const currentJ6 = assignments.value.find(i => i.id === 'practicum-w8-j6');
+            if (currentJ6) currentJ6.status = 'not_started';
+          }
           assignments.value = enrichWithStaticSnapshotData(assignments.value);
+          saveToLocalStorage();
         };
 
         const saveToLocalStorage = () => {
-          localStorage.setItem('indiana_tech_dba_v6', JSON.stringify(assignments.value));
+          localStorage.setItem('indiana_tech_dba_v7', JSON.stringify(assignments.value));
         };
 
         watch(assignments, () => {
