@@ -61,8 +61,8 @@
       background: #cbd5e1;
       border-radius: 4px;
     }
-    html:not(.dark) .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
+    :root {
+      --header-height: 64px;
     }
   </style>
 </head>
@@ -175,88 +175,19 @@
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-
-      <!-- TOP VIEW NAVIGATION BAR: Toggle between Semester 8-Week View & Calendar Weeks Agenda -->
-      <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3.5 transition-colors">
-        
-        <!-- View Mode Segmented Controls -->
-        <div class="flex items-center bg-slate-100 dark:bg-slate-900 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-800 w-full md:w-auto">
-          <!-- Semester View Button -->
-          <button @click="activeViewMode = 'semester'"
-                  :class="['flex-1 md:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer',
-                           activeViewMode === 'semester'
-                             ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700'
-                             : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white']">
-            <i class="fa-solid fa-graduation-cap text-amber-500"></i>
-            <span>8-Week Semester View</span>
-          </button>
-
-          <!-- Calendar Weeks Agenda Button -->
-          <button @click="activeViewMode = 'calendar'"
-                  :class="['flex-1 md:flex-none px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 cursor-pointer relative',
-                           activeViewMode === 'calendar'
-                             ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm border border-slate-200 dark:border-slate-700'
-                             : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white']">
-            <i class="fa-solid fa-calendar-week text-purple-500"></i>
-            <span>Calendar Weeks Agenda</span>
-            <span v-if="calendarTotalPendingCount > 0" class="bg-amber-500 text-slate-950 text-[10px] px-1.5 py-0.5 rounded-full font-black">
-              {{ calendarTotalPendingCount }} Left
-            </span>
-          </button>
-        </div>
-
-        <!-- Overlap Callout / Current Status Pill -->
-        <div class="flex items-center justify-between md:justify-end gap-2 text-xs">
-          <div class="flex items-center gap-2">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-semibold bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/50">
-              <i class="fa-solid fa-code-merge text-purple-500"></i>
-              <span><strong>Fall 2:</strong> DBA 7011 + OLHE 7008 Nov Overlap</span>
-            </span>
-            <button @click="focusOverlapWeeks" 
-                    class="px-2.5 py-1.5 rounded-xl font-bold bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm cursor-pointer whitespace-nowrap flex items-center gap-1">
-              <i class="fa-solid fa-bolt text-[10px]"></i>
-              <span class="hidden sm:inline">Inspect</span> Nov Overlap
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Overlap Alert / Notification Banner -->
-      <div v-if="activeSemester === 'Fall 2 - 2026' || activeSemester === 'ALL' || activeViewMode === 'calendar'" 
-           class="bg-gradient-to-r from-purple-500/10 via-amber-500/10 to-emerald-500/10 border border-purple-300/80 dark:border-purple-500/40 rounded-2xl p-4 sm:p-4.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm transition-all">
-        <div class="flex items-start gap-3">
-          <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-600 dark:text-purple-300 flex items-center justify-center flex-shrink-0 mt-0.5">
-            <i class="fa-solid fa-layer-group text-base"></i>
-          </div>
-          <div>
-            <h4 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <span>Fall 2 Term Active • Multi-Class Overlap in November</span>
-              <span class="bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-500/40 text-[10px] px-2 py-0.2 rounded-full font-bold">Important</span>
-            </h4>
-            <p class="text-xs text-slate-600 dark:text-slate-300 mt-0.5 leading-relaxed">
-              New class <strong>DBA 7011 - Finance for Business Leaders (Dr Wade)</strong> is starting now for Fall 2. Its assignments in Weeks 2 & 3 overlap directly with <strong>OLHE 7008 (Global Practicum)</strong> which has deliverables extending to <strong>Nov 8th</strong>. Both are integrated into your weekly tracking below!
-            </p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
-          <button @click="activeViewMode = 'calendar'; calendarFilterIncompleteOnly = true" 
-                  class="px-3.5 py-1.5 text-xs font-bold bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-purple-700 dark:text-purple-300 border border-purple-300 dark:border-purple-700 rounded-xl transition shadow-sm cursor-pointer flex items-center gap-1.5 whitespace-nowrap">
-            <i class="fa-solid fa-calendar-check text-xs"></i>
-            <span>Show What's Left By Week</span>
-          </button>
-        </div>
-      </div>
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-8 space-y-6">
 
       <!-- ========================================================================= -->
       <!-- VIEW MODE 1: SEMESTER 8-WEEK VIEW -->
       <!-- ========================================================================= -->
       <div v-if="activeViewMode === 'semester'" class="space-y-6">
 
-        <!-- Overall Progress & Dashboard Banner -->
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm relative overflow-hidden transition-colors">
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
+        <!-- FROZEN STICKY TOP SECTION: Top Part down to the Filters Panel remains visible when scrolling -->
+        <div class="sticky top-[var(--header-height,64px)] z-30 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md pt-2 pb-3 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 space-y-3.5 border-b border-slate-200/80 dark:border-slate-800 shadow-sm transition-colors">
+
+          <!-- Overall Progress & Dashboard Banner -->
+          <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-sm relative overflow-hidden transition-colors">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-stretch">
             
             <!-- Current Week Progress Tracker (Compact) -->
             <div class="lg:col-span-4 bg-emerald-50/60 dark:bg-slate-900/60 border border-emerald-300/80 dark:border-emerald-500/40 rounded-xl p-3.5 flex flex-col justify-between space-y-2 shadow-sm dark:shadow-inner relative overflow-hidden transition-colors">
@@ -424,7 +355,7 @@
                           ? 'bg-purple-600 text-white border-purple-500 shadow-purple-500/20'
                           : 'bg-purple-50 text-purple-800 border-purple-300 hover:bg-purple-100 dark:bg-purple-500/10 dark:text-purple-300 dark:border-purple-500/40 dark:hover:bg-purple-500/20'
                       ]">
-                <i class="fa-solid fa-bolt text-purple-500 dark:text-purple-400"></i>
+                <i :class="['fa-solid fa-bolt', selectedStatus === 'PENDING' ? 'text-amber-300' : 'text-purple-500 dark:text-purple-400']"></i>
                 <span>Pending Actions</span>
                 <span v-if="selectedStatus === 'PENDING'" class="bg-slate-950/40 text-purple-200 text-xs px-2 py-0.5 rounded-full font-black">ON</span>
               </button>
@@ -456,6 +387,8 @@
               <input v-model="searchQuery" type="text" placeholder="Search tasks..." class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl pl-9 pr-3.5 py-2 text-xs sm:text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:border-purple-500 transition-colors">
             </div>
           </div>
+        </div>
+
         </div>
 
         <!-- Empty State -->
@@ -628,7 +561,7 @@
                             'w-full py-3 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition flex items-center justify-center gap-2 shadow cursor-pointer',
                             item.status === 'completed' 
                               ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20' 
-                              : 'bg-purple-600 hover:bg-purple-500 text-white shadow-purple-600/20'
+                              : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-emerald-500/20'
                           ]">
                     <i :class="['fa-solid', item.status === 'completed' ? 'fa-circle-check' : 'fa-circle']"></i>
                     <span>{{ item.status === 'completed' ? 'Assignment Completed' : 'Mark as Completed' }}</span>
@@ -897,7 +830,7 @@
                               'w-full py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-xs',
                               item.status === 'completed' 
                                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white' 
-                                : 'bg-purple-600 hover:bg-purple-500 text-white'
+                                : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
                             ]">
                       <i :class="['fa-solid', item.status === 'completed' ? 'fa-circle-check' : 'fa-circle']"></i>
                       <span>{{ item.status === 'completed' ? 'Completed' : 'Mark Completed (Sun ' + formatDate(item.dueDateFinal) + ')' }}</span>
@@ -994,7 +927,8 @@
         };
 
         const activeSemester = ref(localStorage.getItem('dba_active_semester') || 'Fall 2 - 2026');
-        const activeViewMode = ref(localStorage.getItem('dba_view_mode') || 'semester');
+        const activeViewMode = ref('semester');
+        localStorage.setItem('dba_view_mode', 'semester');
         const calendarFilterIncompleteOnly = ref(false);
         const showFall1History = ref(false);
 
@@ -1019,7 +953,7 @@
         const searchQuery = ref('');
         const selectedWeek = ref('ALL');
         const selectedCourse = ref('ALL');
-        const selectedStatus = ref('ALL');
+        const selectedStatus = ref('PENDING');
         const selectedType = ref('ALL');
 
         // Course Catalog across Semesters
@@ -3012,6 +2946,15 @@
         };
 
         onMounted(async () => {
+          const updateHeaderHeight = () => {
+            const h = document.querySelector('header');
+            if (h) {
+              document.documentElement.style.setProperty('--header-height', `${h.offsetHeight}px`);
+            }
+          };
+          updateHeaderHeight();
+          window.addEventListener('resize', updateHeaderHeight);
+
           loadFromLocalStorage();
           if (supabaseUrl.value && supabaseAnonKey.value && window.supabase) {
             await initSupabase();
